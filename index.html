@@ -3,7 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Học Viện Ôn Ngọc beU - Tổng Hợp Chấm Công </title>
+    
+    <!-- Sửa lỗi hiển thị tiêu đề trên trình duyệt -->
+    <title>Học Viện Ôn Ngọc BeU - Tổng Hợp Chấm Công</title>
+    
+    <!-- Thêm bộ thẻ Meta Open Graph để Zalo, Facebook hiển thị đúng tên khi chia sẻ link -->
+    <meta property="og:title" content="Học Viện Ôn Ngọc BeU - Tổng Hợp Chấm Công">
+    <meta property="og:description" content="Hệ thống quản trị nội bộ dành cho Admin Học Viện Ôn Ngọc BeU.">
+    <meta property="og:type" content="website">
+    
     <!-- Thêm font Montserrat từ Google Fonts, hỗ trợ full Tiếng Việt -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -221,7 +229,7 @@
             
             <!-- Branding Text Overlay -->
             <div class="absolute bottom-12 left-12 z-30">
-                <h2 class="text-3xl font-black text-beu-darkPurple tracking-widest drop-shadow-sm">HỌC VIỆN ÔN NGỌC beU</h2>
+                <h2 class="text-3xl font-black text-beu-darkPurple tracking-widest drop-shadow-sm">HỌC VIỆN ÔN NGỌC BeU</h2>
                 <p class="text-beu-darkTeal font-bold mt-2 text-base tracking-wide">Học thêm một ngôn ngữ là sống thêm một cuộc đời</p>
             </div>
         </div>
@@ -277,7 +285,7 @@
                 <div class="mt-12 text-center w-full">
                     <p class="text-xs text-gray-400 font-medium leading-relaxed">
                         Bảo mật & Vận hành bởi Admin Yên<br>
-                        &copy; 2026 Học Viện Ôn Ngọc beU
+                        &copy; 2026 Học Viện Ôn Ngọc BeU
                     </p>
                 </div>
             </div>
@@ -310,7 +318,7 @@
                     <!-- Tên Thương Hiệu -->
                     <div class="text-left flex-1">
                         <h1 class="text-xl font-black text-beu-teal tracking-widest uppercase drop-shadow-md leading-none mb-1">Học Viện</h1>
-                        <span class="text-white text-xs font-semibold tracking-widest opacity-90">ÔN NGỌC beU</span>
+                        <span class="text-white text-xs font-semibold tracking-widest opacity-90">ÔN NGỌC BeU</span>
                     </div>
                     
                     <!-- Nút Đóng Menu -->
@@ -339,7 +347,7 @@
                 </div>
                 <div class="overflow-hidden flex-1">
                     <p id="sidebarUserName" class="text-base font-bold drop-shadow truncate w-full" title="Admin Yên">Admin Yên</p>
-                    <p class="text-xs text-beu-lightTeal font-semibold">Giáo Vụ Trưởng</p>
+                    <p class="text-xs text-beu-lightTeal font-semibold">Admin</p>
                 </div>
                 <!-- Nút Đăng Xuất -->
                 <button onclick="logout()" class="ml-auto text-white/50 hover:text-red-400 p-2 transition-colors bg-white/5 rounded-lg hover:bg-white/10 shrink-0" title="Đăng Xuất">
@@ -566,7 +574,7 @@
                 </div>
                 
                 <div class="text-center text-xs text-gray-400 pt-4 pb-10 font-medium tracking-wide">
-                    <i class="fas fa-shield-alt mr-1"></i> BẢO MẬT & VẬN HÀNH BỞI ADMIN YÊN - HỌC VIỆN ÔN NGỌC beU &copy; 2026
+                    <i class="fas fa-shield-alt mr-1"></i> BẢO MẬT & VẬN HÀNH BỞI ADMIN YÊN - HỌC VIỆN ÔN NGỌC BeU &copy; 2026
                 </div>
             </div>
         </main>
@@ -811,7 +819,7 @@
         }
 
         // =========================================================================
-        // LINK API CỦA HỌC VIỆN ÔN NGỌC beU
+        // LINK API CỦA HỌC VIỆN ÔN NGỌC BeU
         // =========================================================================
         const API_URL = 'https://script.google.com/macros/s/AKfycbxGc6H5DnyFuntTdyzUdYW8d1-PcSHFsF9XDsXhQ7IwqygiZnlE0E8UbYqNkAEplSAp4A/exec'; 
         
