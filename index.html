@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Học Viện Ôn Ngọc BeU - Tổng Hợp Chấm Công Premium</title>
+    <title>Học Viện Ôn Ngọc beU - Tổng Hợp Chấm Công </title>
     <!-- Thêm font Montserrat từ Google Fonts, hỗ trợ full Tiếng Việt -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -221,7 +221,7 @@
             
             <!-- Branding Text Overlay -->
             <div class="absolute bottom-12 left-12 z-30">
-                <h2 class="text-3xl font-black text-beu-darkPurple tracking-widest drop-shadow-sm">HỌC VIỆN ÔN NGỌC BeU</h2>
+                <h2 class="text-3xl font-black text-beu-darkPurple tracking-widest drop-shadow-sm">HỌC VIỆN ÔN NGỌC beU</h2>
                 <p class="text-beu-darkTeal font-bold mt-2 text-base tracking-wide">Học thêm một ngôn ngữ là sống thêm một cuộc đời</p>
             </div>
         </div>
@@ -248,7 +248,7 @@
                         <label class="text-beu-darkPurple text-sm font-bold mb-2 block ml-1">Tên đăng nhập (Email)</label>
                         <div class="relative">
                             <!-- Nền ô nhập liệu màu xám xanh hiện đại -->
-                            <input type="email" id="emailInput" placeholder="Nhập email..." class="w-full bg-[#f4f7fe] border border-transparent text-beu-darkPurple placeholder-gray-400 px-5 py-4 rounded-2xl focus:outline-none focus:bg-white focus:border-beu-teal focus:ring-4 focus:ring-beu-teal/10 transition-all font-medium text-sm">
+                            <input type="email" id="emailInput" placeholder="Nhập email (@vinvi.com.vn)..." class="w-full bg-[#f4f7fe] border border-transparent text-beu-darkPurple placeholder-gray-400 px-5 py-4 rounded-2xl focus:outline-none focus:bg-white focus:border-beu-teal focus:ring-4 focus:ring-beu-teal/10 transition-all font-medium text-sm">
                             <i class="fas fa-envelope absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-beu-teal transition-colors"></i>
                         </div>
                     </div>
@@ -277,7 +277,7 @@
                 <div class="mt-12 text-center w-full">
                     <p class="text-xs text-gray-400 font-medium leading-relaxed">
                         Bảo mật & Vận hành bởi Admin Yên<br>
-                        &copy; 2026 Học Viện Ôn Ngọc BeU
+                        &copy; 2026 Học Viện Ôn Ngọc beU
                     </p>
                 </div>
             </div>
@@ -310,7 +310,7 @@
                     <!-- Tên Thương Hiệu -->
                     <div class="text-left flex-1">
                         <h1 class="text-xl font-black text-beu-teal tracking-widest uppercase drop-shadow-md leading-none mb-1">Học Viện</h1>
-                        <span class="text-white text-xs font-semibold tracking-widest opacity-90">ÔN NGỌC BeU</span>
+                        <span class="text-white text-xs font-semibold tracking-widest opacity-90">ÔN NGỌC beU</span>
                     </div>
                     
                     <!-- Nút Đóng Menu -->
@@ -339,7 +339,7 @@
                 </div>
                 <div class="overflow-hidden flex-1">
                     <p id="sidebarUserName" class="text-base font-bold drop-shadow truncate w-full" title="Admin Yên">Admin Yên</p>
-                    <p class="text-xs text-beu-lightTeal font-semibold">ONBU</p>
+                    <p class="text-xs text-beu-lightTeal font-semibold">Giáo Vụ Trưởng</p>
                 </div>
                 <!-- Nút Đăng Xuất -->
                 <button onclick="logout()" class="ml-auto text-white/50 hover:text-red-400 p-2 transition-colors bg-white/5 rounded-lg hover:bg-white/10 shrink-0" title="Đăng Xuất">
@@ -566,7 +566,7 @@
                 </div>
                 
                 <div class="text-center text-xs text-gray-400 pt-4 pb-10 font-medium tracking-wide">
-                    <i class="fas fa-shield-alt mr-1"></i> BẢO MẬT & VẬN HÀNH BỞI ADMIN YÊN - HỌC VIỆN ÔN NGỌC BeU &copy; 2026
+                    <i class="fas fa-shield-alt mr-1"></i> BẢO MẬT & VẬN HÀNH BỞI ADMIN YÊN - HỌC VIỆN ÔN NGỌC beU &copy; 2026
                 </div>
             </div>
         </main>
@@ -681,9 +681,25 @@
             
             const emailVal = emailInput.value.trim();
             
+            // Xóa trạng thái lỗi cũ của email nếu có
+            emailInput.classList.remove('border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
+
             if (!emailVal) {
                 errorMsg.innerHTML = '<i class="fas fa-exclamation-triangle mr-1"></i> Vui lòng nhập Email!';
                 errorMsg.classList.remove('hidden');
+                emailInput.classList.add('border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
+                emailInput.focus();
+                return;
+            }
+
+            // Kiểm tra định dạng đuôi email bắt buộc phải là @vinvi.com.vn
+            if (!emailVal.toLowerCase().endsWith('@vinvi.com.vn')) {
+                errorMsg.innerHTML = '<i class="fas fa-exclamation-triangle mr-1"></i> Email phải thuộc tên miền @vinvi.com.vn!';
+                errorMsg.classList.remove('hidden');
+                emailInput.classList.add('border-red-500', 'focus:border-red-500', 'focus:ring-red-500', 'animate-pulse');
+                setTimeout(() => {
+                    emailInput.classList.remove('animate-pulse');
+                }, 500);
                 emailInput.focus();
                 return;
             }
@@ -733,6 +749,7 @@
             document.getElementById('passwordInput').value = '';
             document.getElementById('loginError').classList.add('hidden');
             document.getElementById('passwordInput').classList.remove('border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
+            document.getElementById('emailInput').classList.remove('border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
             document.getElementById('emailInput').focus();
         }
 
@@ -788,7 +805,7 @@
         }
 
         // =========================================================================
-        // LINK API CỦA HỌC VIỆN ÔN NGỌC BeU
+        // LINK API CỦA HỌC VIỆN ÔN NGỌC beU
         // =========================================================================
         const API_URL = 'https://script.google.com/macros/s/AKfycbxGc6H5DnyFuntTdyzUdYW8d1-PcSHFsF9XDsXhQ7IwqygiZnlE0E8UbYqNkAEplSAp4A/exec'; 
         
