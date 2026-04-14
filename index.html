@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Học Viện Ôn Ngọc BeU - Tổng Hợp Chấm Công </title>
+    <title>Học Viện Ôn Ngọc beU - Tổng Hợp Chấm Công </title>
     <!-- Thêm font Montserrat từ Google Fonts, hỗ trợ full Tiếng Việt -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -221,7 +221,7 @@
             
             <!-- Branding Text Overlay -->
             <div class="absolute bottom-12 left-12 z-30">
-                <h2 class="text-3xl font-black text-beu-darkPurple tracking-widest drop-shadow-sm">HỌC VIỆN ÔN NGỌC BeU</h2>
+                <h2 class="text-3xl font-black text-beu-darkPurple tracking-widest drop-shadow-sm">HỌC VIỆN ÔN NGỌC beU</h2>
                 <p class="text-beu-darkTeal font-bold mt-2 text-base tracking-wide">Học thêm một ngôn ngữ là sống thêm một cuộc đời</p>
             </div>
         </div>
@@ -277,7 +277,7 @@
                 <div class="mt-12 text-center w-full">
                     <p class="text-xs text-gray-400 font-medium leading-relaxed">
                         Bảo mật & Vận hành bởi Admin Yên<br>
-                        &copy; 2026 Học Viện Ôn Ngọc BeU
+                        &copy; 2026 Học Viện Ôn Ngọc beU
                     </p>
                 </div>
             </div>
@@ -310,7 +310,7 @@
                     <!-- Tên Thương Hiệu -->
                     <div class="text-left flex-1">
                         <h1 class="text-xl font-black text-beu-teal tracking-widest uppercase drop-shadow-md leading-none mb-1">Học Viện</h1>
-                        <span class="text-white text-xs font-semibold tracking-widest opacity-90">ÔN NGỌC BeU</span>
+                        <span class="text-white text-xs font-semibold tracking-widest opacity-90">ÔN NGỌC beU</span>
                     </div>
                     
                     <!-- Nút Đóng Menu -->
@@ -339,7 +339,7 @@
                 </div>
                 <div class="overflow-hidden flex-1">
                     <p id="sidebarUserName" class="text-base font-bold drop-shadow truncate w-full" title="Admin Yên">Admin Yên</p>
-                    <p class="text-xs text-beu-lightTeal font-semibold">ONBU</p>
+                    <p class="text-xs text-beu-lightTeal font-semibold">Giáo Vụ Trưởng</p>
                 </div>
                 <!-- Nút Đăng Xuất -->
                 <button onclick="logout()" class="ml-auto text-white/50 hover:text-red-400 p-2 transition-colors bg-white/5 rounded-lg hover:bg-white/10 shrink-0" title="Đăng Xuất">
@@ -566,7 +566,7 @@
                 </div>
                 
                 <div class="text-center text-xs text-gray-400 pt-4 pb-10 font-medium tracking-wide">
-                    <i class="fas fa-shield-alt mr-1"></i> BẢO MẬT & VẬN HÀNH BỞI ADMIN YÊN - HỌC Viện Ôn Ngọc BeU &copy; 2026
+                    <i class="fas fa-shield-alt mr-1"></i> BẢO MẬT & VẬN HÀNH BỞI ADMIN YÊN - HỌC VIỆN ÔN NGỌC beU &copy; 2026
                 </div>
             </div>
         </main>
@@ -649,6 +649,14 @@
         }
 
         document.addEventListener("DOMContentLoaded", () => {
+            // Set up Month selector FIRST
+            const now = new Date();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const yyyy = now.getFullYear();
+            
+            document.getElementById('monthSelector').value = `${yyyy}-${mm}`;
+            document.getElementById('dynamicMonthTitle').innerText = `Tổng Hợp Công - Tháng ${mm}.${yyyy}`;
+
             // Kiểm tra trạng thái đăng nhập
             const isLoggedIn = sessionStorage.getItem('beu_dashboard_auth');
             
@@ -660,18 +668,13 @@
                 
                 const savedEmail = sessionStorage.getItem('beu_user_email');
                 if (savedEmail) updateUserInfo(savedEmail);
+
+                // THÊM MỚI: Tự động đồng bộ nếu đã đăng nhập từ trước
+                startSync();
             } else {
                 // Chưa đăng nhập -> Focus vào ô email
                 document.getElementById('emailInput').focus();
             }
-
-            // Set up Month selector
-            const now = new Date();
-            const mm = String(now.getMonth() + 1).padStart(2, '0');
-            const yyyy = now.getFullYear();
-            
-            document.getElementById('monthSelector').value = `${yyyy}-${mm}`;
-            document.getElementById('dynamicMonthTitle').innerText = `Tổng Hợp Công - Tháng ${mm}.${yyyy}`;
         });
 
         function checkPassword() {
@@ -719,6 +722,9 @@
                     loginScreen.classList.add('hidden');
                     document.getElementById('mainApp').classList.remove('hidden');
                     document.getElementById('mainApp').classList.add('flex');
+                    
+                    // THÊM MỚI: Tự động đồng bộ ngay sau khi đăng nhập thành công
+                    startSync();
                 }, 300); // 300ms khớp với transition CSS
                 
             } else {
@@ -805,7 +811,7 @@
         }
 
         // =========================================================================
-        // LINK API CỦA HỌC VIỆN ÔN NGỌC BeU
+        // LINK API CỦA HỌC VIỆN ÔN NGỌC beU
         // =========================================================================
         const API_URL = 'https://script.google.com/macros/s/AKfycbxGc6H5DnyFuntTdyzUdYW8d1-PcSHFsF9XDsXhQ7IwqygiZnlE0E8UbYqNkAEplSAp4A/exec'; 
         
