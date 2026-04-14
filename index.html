@@ -848,14 +848,35 @@
             const statusText = document.getElementById('syncStatusText');
             const progressBar = document.getElementById('syncProgressBar');
             
-            overlay.style.display = 'flex';
+            // --- CÔNG NGHỆ BỘ NHỚ ĐỆM (CACHE) SIÊU TỐC ---
+            const cacheKey = 'beu_data_' + formattedMonth;
+            const cachedRawData = localStorage.getItem(cacheKey);
+            
+            if (cachedRawData) {
+                try {
+                    const parsedCache = JSON.parse(cachedRawData);
+                    globalDriveData = parsedCache.data;
+                    globalTrendData = parsedCache.trend;
+                    renderData();
+                    renderCharts(formattedMonth, globalTrendData);
+                    
+                    // Hiển thị trạng thái đang ngầm làm mới thay vì bảng loading cản trở
+                    document.getElementById('lastUpdateTime').innerText = "Đang làm mới ngầm...";
+                } catch(e) {
+                    overlay.style.display = 'flex';
+                }
+            } else {
+                overlay.style.display = 'flex';
+            }
+            
             progressBar.style.width = '10%';
             statusText.innerText = `Đang kết nối để tải tháng ${formattedMonth}...`;
 
             try {
                 let progress = 10;
                 const progressInterval = setInterval(() => {
-                    if(progress < 85) {
+                    // Chỉ tăng thanh bar nếu màn hình loading đang hiển thị
+                    if(progress < 85 && overlay.style.display === 'flex') {
                         progress += Math.random() * 15;
                         progressBar.style.width = `${progress}%`;
                     }
@@ -881,8 +902,12 @@
                 statusText.innerText = "Đồng bộ dữ liệu thành công!";
 
                 if (jsonResponse.status === "success") {
+                    // Lưu dữ liệu mới nhất vào Bộ nhớ đệm cho lần mở web sau
+                    localStorage.setItem(cacheKey, textRaw);
+                    
                     globalDriveData = jsonResponse.data;
                     globalTrendData = jsonResponse.trend; 
+                    
                     setTimeout(() => {
                         overlay.style.display = 'none';
                         renderData(); 
@@ -897,7 +922,9 @@
 
             } catch (error) {
                 overlay.style.display = 'none';
-                showError("LỖI LIÊN KẾT: Mạng nội bộ chặn hoặc link API của bạn bị sai (đảm bảo kết thúc bằng <b>/exec</b>).");
+                if (!cachedRawData) {
+                    showError("LỖI LIÊN KẾT: Mạng nội bộ chặn hoặc link API của bạn bị sai (đảm bảo kết thúc bằng <b>/exec</b>).");
+                }
                 console.error(error);
             }
         }
