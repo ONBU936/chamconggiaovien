@@ -285,7 +285,7 @@
                             <a href="#" class="text-xs font-bold text-beu-teal hover:text-beu-darkTeal transition-colors">Quên mật khẩu?</a>
                         </div>
                         <div class="relative">
-                            <input type="password" id="passwordInput" placeholder="Nhập mật khẩu..." onkeypress="if(event.key === 'Enter') checkPassword()" class="w-full bg-[#f4f7fe] border border-transparent text-beu-darkPurple placeholder-gray-400 px-5 py-4 rounded-2xl focus:outline-none focus:bg-white focus:border-beu-teal focus:ring-4 focus:ring-beu-teal/10 transition-all font-medium text-sm">
+                            <input type="password" id="passwordInput" placeholder="Mật khẩu Admin hoặc Kế toán (Chỉ xem)..." onkeypress="if(event.key === 'Enter') checkPassword()" class="w-full bg-[#f4f7fe] border border-transparent text-beu-darkPurple placeholder-gray-400 px-5 py-4 rounded-2xl focus:outline-none focus:bg-white focus:border-beu-teal focus:ring-4 focus:ring-beu-teal/10 transition-all font-medium text-sm">
                             <i class="fas fa-lock absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-beu-teal transition-colors"></i>
                         </div>
                     </div>
@@ -355,8 +355,8 @@
                 <div class="flex items-center gap-4 justify-center lg:justify-start">
                     <div id="sidebarUserAvatar" class="w-12 h-12 rounded-xl bg-gradient-to-tr from-beu-teal to-beu-lightTeal flex items-center justify-center text-white font-black text-lg shadow-glow border border-white/20 uppercase shrink-0">Y</div>
                     <div class="overflow-hidden flex-1 sidebar-text">
-                        <p id="sidebarUserName" class="text-base font-bold drop-shadow truncate w-full" title="Admin Yên">Admin Yên</p>
-                        <p class="text-xs text-beu-lightTeal font-semibold">Admin</p>
+                        <p id="sidebarUserName" class="text-base font-bold drop-shadow truncate w-full" title="Tài Khoản">Admin Yên</p>
+                        <p id="sidebarUserRole" class="text-xs text-beu-lightTeal font-semibold">Quản trị viên</p>
                     </div>
                     <button onclick="logout()" class="ml-auto text-white/50 hover:text-red-400 p-2 transition-colors bg-white/5 rounded-lg hover:bg-white/10 shrink-0 sidebar-text" title="Đăng Xuất"><i class="fas fa-sign-out-alt"></i></button>
                 </div>
@@ -394,7 +394,7 @@
                 <div class="flex items-center gap-3 lg:gap-5">
                     <div class="hidden xl:flex flex-col text-right">
                         <span class="text-xs text-gray-400 font-bold uppercase tracking-wider">Trạng thái</span>
-                        <span id="lastUpdateTime" class="text-sm font-bold text-beu-darkTeal">Sẵn sàng nhập liệu</span>
+                        <span id="lastUpdateTime" class="text-sm font-bold text-beu-darkTeal">Sẵn sàng</span>
                     </div>
                     
                     <!-- NÚT LƯU DỮ LIỆU ĐA NĂNG -->
@@ -405,18 +405,21 @@
                         <!-- Dropdown menu -->
                         <div class="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right scale-95 group-hover:scale-100 z-[100] overflow-hidden">
                             <div class="p-2 space-y-1">
-                                <button onclick="fetchDataFromCloud()" class="w-full text-left px-4 py-3 text-sm font-bold text-blue-600 hover:bg-blue-50 hover:text-blue-700 rounded-xl transition-colors flex items-center gap-3">
+                                <button id="menuDownloadCloud" onclick="fetchDataFromCloud()" class="w-full text-left px-4 py-3 text-sm font-bold text-blue-600 hover:bg-blue-50 hover:text-blue-700 rounded-xl transition-colors flex items-center gap-3">
                                     <i class="fas fa-cloud-download-alt text-lg w-5 text-center"></i> Tải dữ liệu từ Google Sheets
                                 </button>
-                                <div class="h-px bg-gray-100 my-1 mx-2"></div>
-                                <button onclick="saveData()" class="w-full text-left px-4 py-3 text-sm font-bold text-beu-darkPurple hover:bg-beu-teal/10 hover:text-beu-teal rounded-xl transition-colors flex items-center gap-3">
+                                
+                                <div id="divSaveCloud" class="h-px bg-gray-100 my-1 mx-2"></div>
+                                <button id="menuSaveCloud" onclick="saveData()" class="w-full text-left px-4 py-3 text-sm font-bold text-beu-darkPurple hover:bg-beu-teal/10 hover:text-beu-teal rounded-xl transition-colors flex items-center gap-3">
                                     <i class="fas fa-cloud-upload-alt text-lg w-5 text-center"></i> Lưu lên Google Sheets
                                 </button>
-                                <div class="h-px bg-gray-100 my-1 mx-2"></div>
+                                
+                                <div id="divConnectNas" class="h-px bg-gray-100 my-1 mx-2"></div>
                                 <!-- NÚT KẾT NỐI FILE NAS ĐỂ DÙNG SONG SONG 2 TÍNH NĂNG -->
-                                <button onclick="connectNasFile()" class="w-full text-left px-4 py-3 text-sm font-bold text-beu-purple hover:bg-purple-50 hover:text-beu-darkPurple rounded-xl transition-colors flex items-center gap-3">
+                                <button id="menuConnectNas" onclick="connectNasFile()" class="w-full text-left px-4 py-3 text-sm font-bold text-beu-purple hover:bg-purple-50 hover:text-beu-darkPurple rounded-xl transition-colors flex items-center gap-3">
                                     <i class="fas fa-server text-lg w-5 text-center"></i> Kết nối File NAS (Đọc & Auto-save)
                                 </button>
+                                
                                 <div class="h-px bg-gray-100 my-1 mx-2"></div>
                                 <button onclick="exportToExcel()" class="w-full text-left px-4 py-3 text-sm font-bold text-gray-600 hover:bg-green-50 hover:text-green-600 rounded-xl transition-colors flex items-center gap-3">
                                     <i class="fas fa-file-excel text-lg text-green-500 w-5 text-center"></i> Xuất Excel Ký Quỹ
@@ -424,8 +427,9 @@
                                 <button onclick="exportReportToExcel()" class="w-full text-left px-4 py-3 text-sm font-bold text-gray-600 hover:bg-green-50 hover:text-green-600 rounded-xl transition-colors flex items-center gap-3">
                                     <i class="fas fa-chart-pie text-lg text-green-500 w-5 text-center"></i> Xuất Báo Cáo Tổng Hợp
                                 </button>
-                                <div class="h-px bg-gray-100 my-1 mx-2"></div>
-                                <button onclick="factoryReset()" class="w-full text-left px-4 py-3 text-sm font-bold text-red-600 hover:bg-red-50 hover:text-red-700 rounded-xl transition-colors flex items-center gap-3">
+                                
+                                <div id="divReset" class="h-px bg-gray-100 my-1 mx-2"></div>
+                                <button id="menuReset" onclick="factoryReset()" class="w-full text-left px-4 py-3 text-sm font-bold text-red-600 hover:bg-red-50 hover:text-red-700 rounded-xl transition-colors flex items-center gap-3">
                                     <i class="fas fa-trash-restore text-lg text-red-500 w-5 text-center"></i> Khôi phục bảng gốc
                                 </button>
                             </div>
@@ -457,22 +461,22 @@
                                     <i class="fas fa-table text-beu-teal"></i> 
                                     <span id="mainTableTitle" contenteditable="true" oninput="forceSaveAll()" class="outline-none focus:bg-beu-teal/10 hover:bg-gray-50 px-2 py-1 rounded transition-colors border border-transparent focus:border-beu-teal/30 cursor-text uppercase">BẢNG THEO DÕI KÝ QUỸ GIÁO VIÊN</span>
                                 </h3>
-                                <button onclick="addRow()" class="hidden lg:flex items-center gap-2 text-xs font-bold text-beu-purple border border-beu-purple/30 bg-beu-purple/5 px-3 py-1.5 rounded-full hover:bg-beu-purple hover:text-white transition-all shadow-sm">
+                                <button id="btnAddRowDesktop" onclick="addRow()" class="hidden lg:flex items-center gap-2 text-xs font-bold text-beu-purple border border-beu-purple/30 bg-beu-purple/5 px-3 py-1.5 rounded-full hover:bg-beu-purple hover:text-white transition-all shadow-sm">
                                     <i class="fas fa-plus"></i> Thêm Dòng Mới
                                 </button>
                                 
                                 <!-- NÚT HOÀN TÁC / LÀM LẠI (UNDO/REDO) -->
-                                <div class="hidden lg:flex items-center gap-1 border-l border-gray-200 pl-4 ml-2">
+                                <div id="undoRedoControls" class="hidden lg:flex items-center gap-1 border-l border-gray-200 pl-4 ml-2">
                                     <button onclick="undoAction()" class="flex items-center justify-center w-8 h-8 text-gray-500 hover:text-beu-darkPurple hover:bg-gray-100 rounded-lg transition-all" title="Quay lại (Ctrl+Z)"><i class="fas fa-undo"></i></button>
                                     <button onclick="redoAction()" class="flex items-center justify-center w-8 h-8 text-gray-500 hover:text-beu-darkPurple hover:bg-gray-100 rounded-lg transition-all" title="Làm lại (Ctrl+Y)"><i class="fas fa-redo"></i></button>
                                 </div>
                             </div>
                             <div class="relative w-full md:w-auto flex items-center gap-3">
                                 <!-- UI CHO MOBILE -->
-                                <button onclick="undoAction()" class="lg:hidden flex items-center justify-center w-10 h-10 text-gray-500 border border-gray-200 bg-white rounded-xl hover:bg-gray-50 transition-all shrink-0" title="Quay lại"><i class="fas fa-undo"></i></button>
-                                <button onclick="redoAction()" class="lg:hidden flex items-center justify-center w-10 h-10 text-gray-500 border border-gray-200 bg-white rounded-xl hover:bg-gray-50 transition-all shrink-0" title="Làm lại"><i class="fas fa-redo"></i></button>
+                                <button id="btnUndoMobile" onclick="undoAction()" class="lg:hidden flex items-center justify-center w-10 h-10 text-gray-500 border border-gray-200 bg-white rounded-xl hover:bg-gray-50 transition-all shrink-0" title="Quay lại"><i class="fas fa-undo"></i></button>
+                                <button id="btnRedoMobile" onclick="redoAction()" class="lg:hidden flex items-center justify-center w-10 h-10 text-gray-500 border border-gray-200 bg-white rounded-xl hover:bg-gray-50 transition-all shrink-0" title="Làm lại"><i class="fas fa-redo"></i></button>
                                 
-                                <button onclick="addRow()" class="lg:hidden flex items-center justify-center w-10 h-10 text-beu-purple border border-beu-purple/30 bg-beu-purple/5 rounded-xl hover:bg-beu-purple hover:text-white transition-all shrink-0">
+                                <button id="btnAddRowMobile" onclick="addRow()" class="lg:hidden flex items-center justify-center w-10 h-10 text-beu-purple border border-beu-purple/30 bg-beu-purple/5 rounded-xl hover:bg-beu-purple hover:text-white transition-all shrink-0">
                                     <i class="fas fa-plus"></i>
                                 </button>
                                 <div class="relative w-full group">
@@ -799,19 +803,31 @@
         
         // Theo dõi ô (cell) đang được chọn để định dạng
         let currentSelectedCell = null;
-        // Auto Save Timer
+        
+        // Biến kiểm soát trạng thái lưu tự động
         let autoSaveTimeout = null;
+        let hasUnsavedChanges = false;
+
+        // CẢNH BÁO KHI NGƯỜI DÙNG ĐỊNH THOÁT MÀ CHƯA LƯU XONG
+        window.addEventListener('beforeunload', function (e) {
+            if (hasUnsavedChanges || autoSaveTimeout) {
+                e.preventDefault();
+                e.returnValue = 'Bạn có dữ liệu Ký Quỹ chưa được lưu lên hệ thống. Bạn có chắc chắn muốn thoát?';
+            }
+        });
 
         // Biến lưu trữ handle của File NAS (Nếu dùng tính năng lưu NAS)
         let nasFileHandle = null;
 
         function triggerAutoSave() {
+            if (sessionStorage.getItem('beu_role') === 'viewer') return; // Chặn lưu nếu là Kế toán
             if (autoSaveTimeout) {
                 clearTimeout(autoSaveTimeout);
             }
+            hasUnsavedChanges = true; // Đánh dấu có thay đổi
             const topStatus = document.getElementById('lastUpdateTime');
             if (topStatus) {
-                topStatus.innerHTML = '<i class="fas fa-hourglass-half text-yellow-500 text-xs"></i> <span class="text-yellow-600">Chờ lưu tự động...</span>';
+                topStatus.innerHTML = '<i class="fas fa-hourglass-half text-yellow-500 text-xs"></i> <span class="text-yellow-600">Chờ 15s để lưu tự động...</span>';
             }
             autoSaveTimeout = setTimeout(() => {
                 saveData(true);
@@ -830,6 +846,54 @@
                 currentSelectedCell = td;
             }
         });
+
+        // ==========================================
+        // CƠ CHẾ PHÂN QUYỀN (ROLE-BASED ACCESS) - MỚI
+        // ==========================================
+        function applyViewerMode() {
+            // Thay đổi tiêu đề cảnh báo
+            document.getElementById('pageSubtitle').innerHTML = '<span class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></span> <span class="hidden sm:inline font-bold text-yellow-600">Chế độ CHỈ XEM (Kế Toán)</span> <i class="fas fa-eye text-yellow-600 ml-1"></i>';
+            document.getElementById('lastUpdateTime').innerHTML = '<span class="text-yellow-600">Chỉ Xem / Đọc Dữ Liệu</span>';
+            document.getElementById('sidebarUserRole').innerText = 'Kế Toán (Chỉ Xem)';
+            
+            // Ẩn các nút Thao tác thêm xóa
+            const addBtns = document.querySelectorAll('#btnAddRowDesktop, #btnAddRowMobile');
+            addBtns.forEach(b => { if(b) b.style.display = 'none'; });
+            
+            const undoBtns = document.querySelectorAll('#undoRedoControls, #btnUndoMobile, #btnRedoMobile');
+            undoBtns.forEach(b => { if(b) b.style.display = 'none'; });
+
+            // Ẩn thanh công cụ định dạng
+            const toolbar = document.getElementById('formatToolbar');
+            if(toolbar) toolbar.style.display = 'none';
+            
+            // Ẩn các nút Lưu & Xóa trong Menu thả xuống
+            ['menuSaveCloud', 'divSaveCloud', 'menuConnectNas', 'divConnectNas', 'menuReset', 'divReset'].forEach(id => {
+                let el = document.getElementById(id);
+                if(el) el.style.display = 'none';
+            });
+            
+            // Khóa bảng hiện tại
+            makeTableReadOnly();
+        }
+
+        function makeTableReadOnly() {
+            if (sessionStorage.getItem('beu_role') !== 'viewer') return; // Nếu là Admin thì bỏ qua
+            
+            // Tắt tính năng gõ chữ
+            document.querySelectorAll('[contenteditable="true"]').forEach(el => el.setAttribute('contenteditable', 'false'));
+            // Khóa checkbox
+            document.querySelectorAll('.refund-confirm-cb').forEach(el => el.disabled = true);
+            // Ẩn thanh kéo giãn cột/hàng
+            document.querySelectorAll('.col-resizer, .row-resizer').forEach(el => el.style.display = 'none');
+            
+            // Khóa tiêu đề chính
+            const mainTitle = document.getElementById('mainTableTitle');
+            if(mainTitle) {
+                mainTitle.contentEditable = "false";
+                mainTitle.classList.remove('hover:bg-gray-50', 'cursor-text');
+            }
+        }
 
         // Logic xử lý các nút trên thanh công cụ (Toolbar)
         function applyFormat(property, value) {
@@ -883,6 +947,7 @@
         }
 
         function forceSaveAll(skipAutoSave = false) {
+            if (sessionStorage.getItem('beu_role') === 'viewer') return; // Chặn lưu nếu là Kế toán
             const snapshotStr = getTableSnapshot();
             localStorage.setItem('beu_deposit_data_v3_stable', snapshotStr); 
             if (!skipAutoSave) triggerAutoSave();
@@ -923,6 +988,7 @@
                 updateDashboardStats();
                 localStorage.setItem('beu_deposit_data_v3_stable', snapshotStr);
                 lastSavedState = snapshotStr;
+                makeTableReadOnly(); // Khóa bảng nếu đang ở chế độ xem
             } catch (e) {
                 console.error("Lỗi phục hồi giao diện:", e);
             }
@@ -959,6 +1025,7 @@
         }
 
         document.addEventListener('keydown', function(e) {
+            if (sessionStorage.getItem('beu_role') === 'viewer') return; // Chặn phím tắt cho Kế toán
             if (e.ctrlKey && e.key === 'z') {
                 e.preventDefault();
                 undoAction();
@@ -994,6 +1061,7 @@
         // KÉO GIÃN DÒNG (ROW RESIZERS)
         // ==========================================
         function rebindRowResizers() {
+            if (sessionStorage.getItem('beu_role') === 'viewer') return; // Không gán sự kiện kéo dòng cho Viewer
             const tbodyTrs = document.querySelectorAll('#spreadsheetBody tr');
             tbodyTrs.forEach(tr => {
                 const rowResizer = tr.querySelector('.row-resizer');
@@ -1032,6 +1100,8 @@
         let contextMenuTarget = null;
 
         document.addEventListener('contextmenu', function(e) {
+            if (sessionStorage.getItem('beu_role') === 'viewer') return; // Chặn Kế Toán bấm chuột phải vào bảng
+            
             const tableArea = e.target.closest('#view-ky-quy table');
             if (tableArea && (e.target.tagName === 'TD' || e.target.tagName === 'TH' || e.target.classList.contains('header-text') || e.target.classList.contains('editable-cell') || e.target.closest('td, th'))) {
                 e.preventDefault();
@@ -1259,6 +1329,7 @@
         // TÍNH NĂNG KÉO DÃN CỘT (RESIZABLE COLUMNS)
         // ==========================================
         function setupColumnResizers() {
+            if (sessionStorage.getItem('beu_role') === 'viewer') return; // Tắt resize cho Viewer
             const cols = document.querySelectorAll('#view-ky-quy table th');
             cols.forEach((col) => {
                 const headerSpan = col.querySelector('.header-text');
@@ -1328,7 +1399,11 @@
                 // Tự động tải dữ liệu từ Google Sheets ngay khi đăng nhập
                 fetchDataFromCloud();
                 
-                setupAutoCalculate();
+                if (sessionStorage.getItem('beu_role') === 'viewer') {
+                    applyViewerMode();
+                } else {
+                    setupAutoCalculate();
+                }
             }
         });
 
@@ -1351,6 +1426,7 @@
                     rebindRowResizers();
                     updateRowCount();
                     updateDashboardStats();
+                    makeTableReadOnly(); // Khóa bảng nếu là viewer
                     return true;
                 } catch(e) { console.error("Lỗi đọc dữ liệu lưu trữ:", e); }
             }
@@ -1428,6 +1504,7 @@
                 tbody.appendChild(tr);
                 updateRowCount();
                 forceSaveAll(); 
+                makeTableReadOnly(); // Khóa dòng mới ngay lập tức nếu là viewer
                 
                 const tableContainer = document.getElementById('spreadsheetContainer');
                 if (tableContainer) tableContainer.scrollTop = tableContainer.scrollHeight;
@@ -1444,7 +1521,8 @@
         function exportToExcel() {
             showMessage("Đang trích xuất dữ liệu ra file Excel...", false);
             try {
-                forceSaveAll(true); 
+                // Admin mới cần save trước khi xuất, Viewer thì chỉ xuất những gì đang thấy
+                if (sessionStorage.getItem('beu_role') !== 'viewer') forceSaveAll(true); 
                 let data = [];
                 
                 let headers = [];
@@ -1572,7 +1650,7 @@
         }
 
         function updateDashboardStats() {
-            forceSaveAll(true); // Skip triggering auto-save to cloud on filter change
+            if (sessionStorage.getItem('beu_role') !== 'viewer') forceSaveAll(true); // Viewer thì không save
             
             let filterMode = 'all'; 
             let fMonth, fYear;
@@ -1938,6 +2016,8 @@
         // AI TỰ ĐỘNG TÍNH TOÁN KÝ QUỸ 
         // ==========================================
         function setupAutoCalculate() {
+            if (sessionStorage.getItem('beu_role') === 'viewer') return; // Viewer không được chạy tính toán
+
             const tbody = document.getElementById('spreadsheetBody');
             
             tbody.addEventListener('focusin', function(e) {
@@ -2324,6 +2404,7 @@
                 const snapshotStr = getTableSnapshot();
                 localStorage.setItem('beu_deposit_data_v3_stable', snapshotStr);
                 lastSavedState = snapshotStr;
+                makeTableReadOnly(); // Khóa nếu đang là viewer
                 
                 return parsedData.thoiGianLuu || "Không rõ";
             } else {
@@ -2379,6 +2460,7 @@
         // GHI VÀO FILE NAS
         async function writeToNasFile(dataArray) {
             if (!nasFileHandle) return; // Nếu chưa kết nối NAS thì bỏ qua
+            if (sessionStorage.getItem('beu_role') === 'viewer') return; // Viewer không ghi NAS
             
             try {
                 const writable = await nasFileHandle.createWritable();
@@ -2411,6 +2493,12 @@
 
             if (pwdInput === "onngocbeu123") {
                 sessionStorage.setItem('beu_auth', 'true');
+                sessionStorage.setItem('beu_role', 'admin');
+                sessionStorage.setItem('beu_user_email', emailInput);
+                location.reload();
+            } else if (pwdInput === "ketoanbeu") { // MẬT KHẨU MỚI DÀNH CHO KẾ TOÁN (VIEWER)
+                sessionStorage.setItem('beu_auth', 'true');
+                sessionStorage.setItem('beu_role', 'viewer');
                 sessionStorage.setItem('beu_user_email', emailInput);
                 location.reload();
             } else {
@@ -2637,6 +2725,7 @@
                         updateDashboardStats();
                         lastSavedState = getTableSnapshot();
                         localStorage.setItem('beu_deposit_data_v3_stable', lastSavedState);
+                        makeTableReadOnly(); // Khóa nếu đang là viewer
                         
                         bar.style.width = '100%';
                         setTimeout(() => {
@@ -2674,6 +2763,8 @@
             const statusText = document.getElementById('syncStatusText');
             const topStatus = document.getElementById('lastUpdateTime');
             
+            if (sessionStorage.getItem('beu_role') === 'viewer') return; // Chặn Kế Toán gọi hàm lưu
+
             if (!GOOGLE_WEB_APP_URL || GOOGLE_WEB_APP_URL.includes("DÁN_LINK_WEB_APP")) {
                 if(!isAutoSave) showMessage("Vui lòng cấu hình URL Google Web App trong code trước khi lưu!", true);
                 return;
@@ -2747,6 +2838,7 @@
                 if (!isAutoSave) bar.style.width = '100%';
 
                 if (result.status === 'success') {
+                    hasUnsavedChanges = false; // Xóa cờ cảnh báo tắt tab
                     const timeStr = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
                     if (!isAutoSave) {
                         setTimeout(() => {
