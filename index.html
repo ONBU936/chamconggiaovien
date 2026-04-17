@@ -814,6 +814,7 @@
             
             let totalSessions = 0;
             let totalApproved = 0;
+            let displayIndex = 0;
 
             if (globalDriveData.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="8" class="py-16 text-center text-gray-500 font-medium">Không tìm thấy file nào hoặc thư mục trống.</td></tr>`;
@@ -821,6 +822,10 @@
             }
 
             globalDriveData.forEach((gv, index) => {
+                // Tự động ẩn các Giáo Viên chưa có Tab
+                if (gv.file && gv.file.includes("Chưa có Tab")) return;
+
+                displayIndex++;
                 totalSessions += gv.total;
                 totalApproved += gv.approved;
 
@@ -838,10 +843,10 @@
 
                 const tr = document.createElement('tr');
                 tr.className = `hover:bg-gray-50/80 transition-colors animate-slide-up group border-b border-gray-100 ${gv.id === "ERR" ? "bg-red-50/50" : ""}`;
-                tr.style.animationDelay = `${index * 0.05}s`;
+                tr.style.animationDelay = `${displayIndex * 0.05}s`;
 
                 tr.innerHTML = `
-                    <td class="py-4 px-6 lg:px-8 text-center text-gray-400 font-bold">${index + 1}</td>
+                    <td class="py-4 px-6 lg:px-8 text-center text-gray-400 font-bold">${displayIndex}</td>
                     <td class="py-4 px-4 lg:px-6 font-medium text-beu-darkPurple flex items-center gap-3">
                         <div class="w-8 h-8 rounded-lg ${gv.id === "ERR" ? "bg-red-100 text-red-500" : "bg-green-100 text-green-600"} flex items-center justify-center shrink-0">
                             <i class="fas fa-file-excel"></i>
@@ -868,7 +873,7 @@
                 tbody.appendChild(tr);
             });
 
-            document.getElementById('statFiles').innerHTML = `${globalDriveData.length} <span class="text-sm lg:text-base font-medium text-gray-400 normal-case hidden sm:inline">file</span>`;
+            document.getElementById('statFiles').innerHTML = `${displayIndex} <span class="text-sm lg:text-base font-medium text-gray-400 normal-case hidden sm:inline">file</span>`;
             document.getElementById('statSessions').innerHTML = `${totalSessions.toLocaleString()} <span class="text-sm lg:text-base font-medium text-gray-400 normal-case hidden sm:inline">buổi học</span>`;
             document.getElementById('statApproved').innerHTML = `${totalApproved.toLocaleString()} <span class="text-sm lg:text-base font-medium text-green-600/50 normal-case hidden sm:inline">/ ${totalSessions}</span>`;
         }
@@ -878,7 +883,8 @@
             document.getElementById('pieEmptyState').style.display = 'none';
             document.getElementById('lineEmptyState').style.display = 'none';
 
-            const activeTeachers = globalDriveData.filter(g => g.id !== "ERR").sort((a,b) => b.total - a.total);
+            // Lọc bỏ lỗi và các Giáo Viên chưa có Tab để không vẽ vào biểu đồ
+            const activeTeachers = globalDriveData.filter(g => g.id !== "ERR" && !(g.file && g.file.includes("Chưa có Tab"))).sort((a,b) => b.total - a.total);
             const teacherNames = activeTeachers.map(g => g.name);
             const teacherTotals = activeTeachers.map(g => g.total);
             const teacherApproved = activeTeachers.map(g => g.approved);
