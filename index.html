@@ -254,6 +254,11 @@
                     <i class="fas fa-file-excel w-5 text-lg transition-transform group-hover:scale-110"></i>
                     <span class="font-semibold relative z-10">Chấm Công Giáo Viên</span>
                 </a>
+                <a href="#" onclick="switchTab('phu-cap'); toggleSidebar();" id="nav-phu-cap" class="sidebar-link flex items-center gap-4 text-white/70 hover:text-white hover:bg-white/10 px-5 py-3.5 rounded-xl transition-all duration-300 group relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-r from-beu-teal/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <i class="fas fa-route w-5 text-lg transition-transform group-hover:scale-110"></i>
+                    <span class="font-semibold relative z-10">Phụ cấp đi lại</span>
+                </a>
             </nav>
             <div class="p-6 border-t border-white/10 bg-black/10 relative z-10">
                 <div class="flex items-center gap-4">
@@ -317,9 +322,9 @@
                 <div id="errorBanner" class="hidden bg-red-50/80 backdrop-blur border-l-4 border-red-500 p-5 rounded-2xl shadow-sm animate-slide-up">
                     <div class="flex items-start">
                         <div class="flex-shrink-0 mt-0.5"><i class="fas fa-exclamation-circle text-red-500 text-xl"></i></div>
-                        <div class="ml-4">
+                        <div class="ml-4 w-full">
                             <h3 class="text-base font-bold text-red-800 uppercase tracking-wide">Cảnh báo hệ thống</h3>
-                            <div class="mt-1 text-sm text-red-700 font-medium" id="errorMessage"></div>
+                            <div class="mt-1 text-sm text-red-700 font-medium whitespace-pre-line" id="errorMessage"></div>
                         </div>
                     </div>
                 </div>
@@ -434,27 +439,120 @@
                         </div>
                         
                         <div class="overflow-x-auto relative z-0 pb-4 w-full">
-                            <table class="w-full text-left border-collapse min-w-[900px]" id="mainTable">
+                            <table class="w-full text-left border-collapse min-w-[1000px]" id="mainTable">
                                 <thead>
                                     <tr class="bg-gray-50/80 text-gray-500 text-xs uppercase tracking-widest border-b border-gray-200">
-                                        <th class="py-5 px-6 lg:px-8 font-bold text-center rounded-tl-xl w-16">STT</th>
-                                        <th class="py-5 px-4 lg:px-6 font-bold">File Google Sheet</th>
-                                        <th class="py-5 px-4 lg:px-6 font-bold text-center">Cập Nhật Cuối</th>
-                                        <th class="py-5 px-4 lg:px-6 font-bold">Giáo Viên Phụ Trách</th>
-                                        <th class="py-5 px-4 lg:px-6 font-bold text-center">Tổng Buổi</th>
-                                        <th class="py-5 px-4 lg:px-6 font-bold text-center">Tiến Độ Chốt</th>
-                                        <th class="py-5 px-4 lg:px-6 font-bold text-center">Trạng Thái Lỗi</th>
-                                        <th class="py-5 px-6 lg:px-8 font-bold text-center rounded-tr-xl">Thao Tác</th>
+                                        <th class="py-5 px-6 lg:px-8 font-bold text-center rounded-tl-xl w-16 group relative">
+                                            <div contenteditable="true" class="editable-header outline-none border-b border-transparent focus:border-beu-teal transition-colors px-2 py-1 rounded hover:bg-black/5 inline-block cursor-text" data-key="header_stt" data-default="STT" spellcheck="false" title="Bấm vào để đổi tên tiêu đề">STT</div>
+                                            <i class="fas fa-pen absolute right-2 top-1/2 -translate-y-1/2 text-[10px] opacity-0 group-hover:opacity-40 transition-opacity pointer-events-none"></i>
+                                        </th>
+                                        <th class="py-5 px-4 lg:px-6 font-bold group relative">
+                                            <div contenteditable="true" class="editable-header outline-none border-b border-transparent focus:border-beu-teal transition-colors px-2 py-1 rounded hover:bg-black/5 inline-block cursor-text" data-key="header_file" data-default="FILE GOOGLE SHEET" spellcheck="false" title="Bấm vào để đổi tên tiêu đề">FILE GOOGLE SHEET</div>
+                                            <i class="fas fa-pen absolute right-2 top-1/2 -translate-y-1/2 text-[10px] opacity-0 group-hover:opacity-40 transition-opacity pointer-events-none"></i>
+                                        </th>
+                                        <th class="py-5 px-4 lg:px-6 font-bold text-center group relative">
+                                            <div contenteditable="true" class="editable-header outline-none border-b border-transparent focus:border-beu-teal transition-colors px-2 py-1 rounded hover:bg-black/5 inline-block cursor-text" data-key="header_updated" data-default="CẬP NHẬT CUỐI" spellcheck="false" title="Bấm vào để đổi tên tiêu đề">CẬP NHẬT CUỐI</div>
+                                            <i class="fas fa-pen absolute right-2 top-1/2 -translate-y-1/2 text-[10px] opacity-0 group-hover:opacity-40 transition-opacity pointer-events-none"></i>
+                                        </th>
+                                        <th class="py-5 px-4 lg:px-6 font-bold group relative">
+                                            <div contenteditable="true" class="editable-header outline-none border-b border-transparent focus:border-beu-teal transition-colors px-2 py-1 rounded hover:bg-black/5 inline-block cursor-text" data-key="header_teacher" data-default="GIÁO VIÊN PHỤ TRÁCH" spellcheck="false" title="Bấm vào để đổi tên tiêu đề">GIÁO VIÊN PHỤ TRÁCH</div>
+                                            <i class="fas fa-pen absolute right-2 top-1/2 -translate-y-1/2 text-[10px] opacity-0 group-hover:opacity-40 transition-opacity pointer-events-none"></i>
+                                        </th>
+                                        <th class="py-5 px-4 lg:px-6 font-bold text-center group relative">
+                                            <div contenteditable="true" class="editable-header outline-none border-b border-transparent focus:border-beu-teal transition-colors px-2 py-1 rounded hover:bg-black/5 inline-block cursor-text" data-key="header_total" data-default="TỔNG BUỔI" spellcheck="false" title="Bấm vào để đổi tên tiêu đề">TỔNG BUỔI</div>
+                                            <i class="fas fa-pen absolute right-2 top-1/2 -translate-y-1/2 text-[10px] opacity-0 group-hover:opacity-40 transition-opacity pointer-events-none"></i>
+                                        </th>
+                                        <th class="py-5 px-4 lg:px-6 font-bold text-center text-beu-teal whitespace-nowrap group relative">
+                                            <div contenteditable="true" class="editable-header outline-none border-b border-transparent focus:border-beu-teal transition-colors px-2 py-1 rounded hover:bg-beu-teal/10 inline-block cursor-text" data-key="header_record" data-default="CÔNG THEO RECORD" spellcheck="false" title="Bấm vào để đổi tên tiêu đề">CÔNG THEO RECORD</div>
+                                            <i class="fas fa-pen absolute right-0 top-1/2 -translate-y-1/2 text-[10px] opacity-0 group-hover:opacity-50 transition-opacity pointer-events-none"></i>
+                                        </th>
+                                        <th class="py-5 px-4 lg:px-6 font-bold text-center group relative">
+                                            <div contenteditable="true" class="editable-header outline-none border-b border-transparent focus:border-beu-teal transition-colors px-2 py-1 rounded hover:bg-black/5 inline-block cursor-text" data-key="header_progress" data-default="TIẾN ĐỘ CHỐT" spellcheck="false" title="Bấm vào để đổi tên tiêu đề">TIẾN ĐỘ CHỐT</div>
+                                            <i class="fas fa-pen absolute right-2 top-1/2 -translate-y-1/2 text-[10px] opacity-0 group-hover:opacity-40 transition-opacity pointer-events-none"></i>
+                                        </th>
+                                        <th class="py-5 px-4 lg:px-6 font-bold text-center group relative">
+                                            <div contenteditable="true" class="editable-header outline-none border-b border-transparent focus:border-beu-teal transition-colors px-2 py-1 rounded hover:bg-black/5 inline-block cursor-text" data-key="header_error" data-default="TRẠNG THÁI LỖI" spellcheck="false" title="Bấm vào để đổi tên tiêu đề">TRẠNG THÁI LỖI</div>
+                                            <i class="fas fa-pen absolute right-2 top-1/2 -translate-y-1/2 text-[10px] opacity-0 group-hover:opacity-40 transition-opacity pointer-events-none"></i>
+                                        </th>
+                                        <th class="py-5 px-6 lg:px-8 font-bold text-center rounded-tr-xl group relative">
+                                            <div contenteditable="true" class="editable-header outline-none border-b border-transparent focus:border-beu-teal transition-colors px-2 py-1 rounded hover:bg-black/5 inline-block cursor-text" data-key="header_action" data-default="THAO TÁC" spellcheck="false" title="Bấm vào để đổi tên tiêu đề">THAO TÁC</div>
+                                            <i class="fas fa-pen absolute right-2 top-1/2 -translate-y-1/2 text-[10px] opacity-0 group-hover:opacity-40 transition-opacity pointer-events-none"></i>
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody id="teachersTableBody" class="text-sm divide-y divide-gray-100">
                                     <tr>
-                                        <td colspan="8" class="py-24 text-center">
+                                        <td colspan="9" class="py-24 text-center">
                                             <div class="inline-flex flex-col items-center justify-center bg-gray-50 rounded-full w-40 h-40 mb-4 border border-gray-100 shadow-inner">
                                                 <i class="fas fa-cloud-download-alt text-5xl text-beu-lightTeal animate-bounce"></i>
                                             </div>
                                             <p class="text-gray-500 font-medium text-lg">Hệ thống đang chờ dữ liệu.</p>
-                                            <p class="text-gray-400 mt-1">Bấm <b class="text-beu-teal">"Đồng Bộ Dữ Liệu"</b> để tải báo cáo và vẽ biểu đồ.</p>
+                                            <p class="text-gray-400 mt-1">Bấm <b class="text-beu-teal">"Đồng Bộ"</b> để tải báo cáo và vẽ biểu đồ.</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-phu-cap" class="hidden animate-slide-up w-full">
+                    <div class="bg-white rounded-3xl shadow-soft border border-gray-100 overflow-hidden relative w-full">
+                        <div class="h-2 w-full bg-gradient-to-r from-green-500 via-beu-teal to-blue-500"></div>
+                        
+                        <div class="px-6 lg:px-8 py-6 border-b border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4 bg-white relative z-10">
+                            <div>
+                                <h3 class="text-xl font-bold text-beu-darkPurple flex items-center gap-3">
+                                    <i class="fas fa-route text-beu-lightTeal"></i> Bảng Phụ Cấp Đi Lại (Giáo Viên Offline)
+                                </h3>
+                                <p class="text-sm text-gray-500 mt-1 ml-8">Mỗi ngày đi dạy (đến Học Viện) được tính phụ cấp <span class="font-bold text-beu-teal">50.000đ</span></p>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div class="bg-gray-50 px-4 py-2 rounded-xl border border-gray-200">
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Tổng Phụ Cấp Tháng</p>
+                                    <p class="text-lg font-black text-beu-darkPurple leading-none" id="totalAllowanceAmount">0 đ</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="overflow-x-auto relative z-0 pb-4 w-full">
+                            <table class="w-full text-left border-collapse min-w-[800px]" id="allowanceTable">
+                                <thead>
+                                    <tr class="bg-gray-50/80 text-gray-500 text-xs uppercase tracking-widest border-b border-gray-200">
+                                        <th class="py-5 px-6 lg:px-8 font-bold text-center rounded-tl-xl w-16 group relative">
+                                            <div contenteditable="true" class="editable-header outline-none border-b border-transparent focus:border-beu-teal transition-colors px-2 py-1 rounded hover:bg-black/5 inline-block cursor-text" data-key="header_allowance_stt" data-default="STT" spellcheck="false" title="Bấm vào để đổi tên">STT</div>
+                                            <i class="fas fa-pen absolute right-2 top-1/2 -translate-y-1/2 text-[10px] opacity-0 group-hover:opacity-40 transition-opacity pointer-events-none"></i>
+                                        </th>
+                                        <th class="py-5 px-4 lg:px-6 font-bold group relative">
+                                            <div contenteditable="true" class="editable-header outline-none border-b border-transparent focus:border-beu-teal transition-colors px-2 py-1 rounded hover:bg-black/5 inline-block cursor-text" data-key="header_allowance_teacher" data-default="GIÁO VIÊN OFFLINE" spellcheck="false" title="Bấm vào để đổi tên">GIÁO VIÊN OFFLINE</div>
+                                            <i class="fas fa-pen absolute right-2 top-1/2 -translate-y-1/2 text-[10px] opacity-0 group-hover:opacity-40 transition-opacity pointer-events-none"></i>
+                                        </th>
+                                        <th class="py-5 px-4 lg:px-6 font-bold text-center group relative">
+                                            <div contenteditable="true" class="editable-header outline-none border-b border-transparent focus:border-beu-teal transition-colors px-2 py-1 rounded hover:bg-black/5 inline-block cursor-text" data-key="header_allowance_days" data-default="SỐ NGÀY THỰC DẠY" spellcheck="false" title="Bấm vào để đổi tên">SỐ NGÀY THỰC DẠY</div>
+                                            <i class="fas fa-pen absolute right-2 top-1/2 -translate-y-1/2 text-[10px] opacity-0 group-hover:opacity-40 transition-opacity pointer-events-none"></i>
+                                        </th>
+                                        <th class="py-5 px-4 lg:px-6 font-bold text-center group relative">
+                                            <div contenteditable="true" class="editable-header outline-none border-b border-transparent focus:border-beu-teal transition-colors px-2 py-1 rounded hover:bg-black/5 inline-block cursor-text" data-key="header_allowance_rate" data-default="MỨC PHỤ CẤP" spellcheck="false" title="Bấm vào để đổi tên">MỨC PHỤ CẤP</div>
+                                            <i class="fas fa-pen absolute right-2 top-1/2 -translate-y-1/2 text-[10px] opacity-0 group-hover:opacity-40 transition-opacity pointer-events-none"></i>
+                                        </th>
+                                        <th class="py-5 px-4 lg:px-6 font-bold text-center text-beu-teal whitespace-nowrap group relative">
+                                            <div contenteditable="true" class="editable-header outline-none border-b border-transparent focus:border-beu-teal transition-colors px-2 py-1 rounded hover:bg-beu-teal/10 inline-block cursor-text" data-key="header_allowance_total" data-default="TỔNG TIỀN (VNĐ)" spellcheck="false" title="Bấm vào để đổi tên">TỔNG TIỀN (VNĐ)</div>
+                                            <i class="fas fa-pen absolute right-0 top-1/2 -translate-y-1/2 text-[10px] opacity-0 group-hover:opacity-50 transition-opacity pointer-events-none"></i>
+                                        </th>
+                                        <th class="py-5 px-6 lg:px-8 font-bold text-center rounded-tr-xl group relative">
+                                            <div contenteditable="true" class="editable-header outline-none border-b border-transparent focus:border-beu-teal transition-colors px-2 py-1 rounded hover:bg-black/5 inline-block cursor-text" data-key="header_allowance_action" data-default="THAO TÁC" spellcheck="false" title="Bấm vào để đổi tên">THAO TÁC</div>
+                                            <i class="fas fa-pen absolute right-2 top-1/2 -translate-y-1/2 text-[10px] opacity-0 group-hover:opacity-40 transition-opacity pointer-events-none"></i>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="allowanceTableBody" class="text-sm divide-y divide-gray-100">
+                                    <tr>
+                                        <td colspan="6" class="py-24 text-center">
+                                            <div class="inline-flex flex-col items-center justify-center bg-gray-50 rounded-full w-40 h-40 mb-4 border border-gray-100 shadow-inner">
+                                                <i class="fas fa-route text-5xl text-beu-lightTeal animate-bounce"></i>
+                                            </div>
+                                            <p class="text-gray-500 font-medium text-lg">Hệ thống đang chờ dữ liệu.</p>
+                                            <p class="text-gray-400 mt-1">Bấm <b class="text-beu-teal">"Đồng Bộ"</b> để tải báo cáo.</p>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -470,7 +568,7 @@
         </main>
     </div>
 
-    <!-- Premium Detail Modal -->
+    <!-- Modal cho bảng Chấm công chính -->
     <div id="detailModal" class="modal fixed inset-0 z-50 items-center justify-center p-4 md:p-10">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-5xl max-h-full overflow-hidden flex flex-col transform transition-all border border-white/20">
             <div class="px-6 lg:px-8 py-5 bg-gradient-to-r from-beu-darkPurple to-beu-purple text-white flex justify-between items-center shrink-0 shadow-md relative overflow-hidden">
@@ -529,6 +627,63 @@
         </div>
     </div>
 
+    <!-- Modal cho bảng Phụ Cấp Đi Lại (Lọc ngày duy nhất) -->
+    <div id="allowanceModal" class="modal fixed inset-0 z-50 items-center justify-center p-4 md:p-10">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-full overflow-hidden flex flex-col transform transition-all border border-white/20">
+            <div class="px-6 lg:px-8 py-5 bg-gradient-to-r from-beu-darkTeal to-beu-teal text-white flex justify-between items-center shrink-0 shadow-md relative overflow-hidden">
+                <div class="absolute right-0 top-0 opacity-10">
+                    <i class="fas fa-calendar-check text-9xl -mt-6 -mr-4"></i>
+                </div>
+                <div class="relative z-10">
+                    <h3 class="text-xl font-bold tracking-wide">Chi Tiết Ngày Thực Dạy</h3>
+                    <p class="text-beu-lightTeal text-sm font-medium mt-1">Các ngày đã được lọc trùng lặp</p>
+                </div>
+                <div class="relative z-10 flex items-center gap-3">
+                    <a id="allowanceModalSheetLink" href="#" target="_blank" class="inline-flex items-center justify-center gap-2 text-sm bg-white/20 hover:bg-white/30 border border-white/30 text-white px-4 py-2 rounded-xl font-bold transition-all shadow-sm backdrop-blur-sm" title="Mở file Google Sheet của Giáo Viên này">
+                        Mở File Gốc <i class="fas fa-external-link-alt text-xs"></i>
+                    </a>
+                    <button onclick="closeAllowanceModal()" class="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="px-6 lg:px-8 py-4 bg-gray-50 border-b border-gray-200 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 shrink-0">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full bg-beu-teal/10 flex items-center justify-center text-beu-teal font-bold text-lg shrink-0">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Giáo Viên Offline</p>
+                        <span class="font-bold text-beu-darkPurple text-lg" id="allowanceModalName">...</span>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Tổng cộng</p>
+                    <span class="font-black text-beu-teal text-lg" id="allowanceModalCount">0</span> <span class="font-bold text-gray-500 text-sm">ngày</span>
+                </div>
+            </div>
+            
+            <div class="p-4 lg:p-8 overflow-y-auto flex-1 bg-white">
+                <div class="rounded-2xl border border-gray-200 overflow-hidden shadow-sm overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gradient-to-r from-beu-lightTeal/30 to-transparent text-beu-darkPurple text-xs uppercase tracking-wider border-b border-gray-200">
+                                <th class="py-4 px-4 font-bold text-center w-16 border-r border-gray-100">STT</th>
+                                <th class="py-4 px-6 font-bold border-r border-gray-100">Ngày Đến Học Viện Dạy</th>
+                                <th class="py-4 px-4 font-bold text-center w-32 bg-green-50/50">Phụ Cấp</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm divide-y divide-gray-100" id="allowanceModalTableBody">
+                            <!-- Data injected here -->
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-xs text-gray-400 mt-4 text-center"><i class="fas fa-info-circle mr-1"></i> Nếu Giáo Viên có 2 lớp trong cùng 1 ngày, hệ thống chỉ đếm là 1 lần đến Học Viện.</p>
+            </div>
+        </div>
+    </div>
+
     <script>
         const CORRECT_PASSWORD = "onngocbeu123";
 
@@ -546,6 +701,37 @@
             
             document.getElementById('monthSelector').value = `${yyyy}-${mm}`;
             document.getElementById('dynamicMonthTitle').innerText = `Tổng Hợp Công - Tháng ${mm}.${yyyy}`;
+
+            // Load tất cả tiêu đề cột đã lưu
+            document.querySelectorAll('.editable-header').forEach(el => {
+                const key = el.getAttribute('data-key');
+                const defaultText = el.getAttribute('data-default');
+                const savedVal = localStorage.getItem('beu_' + key);
+                
+                if (savedVal) {
+                    el.innerText = savedVal;
+                } else {
+                    el.innerText = defaultText;
+                }
+
+                // Chặn nút Enter tạo dòng mới, bấm Enter là lưu
+                el.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        this.blur(); 
+                    }
+                });
+
+                // Tự động lưu khi click ra ngoài
+                el.addEventListener('blur', function() {
+                    let newTitle = this.innerText.trim();
+                    if(newTitle === '') {
+                        newTitle = this.getAttribute('data-default'); // Trả về mặc định nếu lỡ tay xóa trắng
+                        this.innerText = newTitle;
+                    }
+                    localStorage.setItem('beu_' + key, newTitle);
+                });
+            });
 
             const isLoggedIn = sessionStorage.getItem('beu_dashboard_auth');
             
@@ -659,7 +845,7 @@
                 link.classList.remove('active');
                 link.classList.remove('text-white', 'bg-white/10'); 
                 const icon = link.querySelector('i');
-                icon.classList.remove('text-beu-lightTeal');
+                if (icon) icon.classList.remove('text-beu-lightTeal');
             });
             
             const activeNav = document.getElementById(`nav-${tabId}`);
@@ -667,25 +853,97 @@
                 activeNav.classList.add('active');
             }
 
-            document.getElementById('view-tong-quan').classList.add('hidden');
-            document.getElementById('view-cham-cong').classList.add('hidden');
+            // Ẩn tất cả các view đang có
+            document.querySelectorAll('[id^="view-"]').forEach(view => {
+                view.classList.add('hidden');
+            });
             
+            // Hiện view được chọn
             const activeView = document.getElementById(`view-${tabId}`);
-            activeView.classList.remove('hidden');
-            
-            activeView.classList.remove('animate-slide-up');
-            void activeView.offsetWidth; 
-            activeView.classList.add('animate-slide-up');
+            if(activeView) {
+                activeView.classList.remove('hidden');
+                activeView.classList.remove('animate-slide-up');
+                void activeView.offsetWidth; 
+                activeView.classList.add('animate-slide-up');
+            }
         }
 
-        // ĐÃ CẬP NHẬT ĐƯỜNG LINK API MỚI CỦA ADMIN YÊN
         const API_URL = 'https://script.google.com/macros/s/AKfycbzJiwa0yvQRbMygBFfLxx293eDCF0feQGPJ3PWSdkxMD3Ar1-vuHjDsHalMzSL5lMYzlw/exec'; 
-        
+        const RECORD_API_URL = 'https://script.google.com/macros/s/AKfycbw4vmNFCwtheFAdcReE9jy41tbOjiNyh_-7UgTVlRZX1thTRtkRTyYQP9pCrE52AK1q/exec'; 
+        const RECORD_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1UQBmzTrNllOUyMUkRLCCsijgCQhHKZkq61Mc7iQuEro/edit?gid=1940195197#gid=1940195197';
+
+        // DANH SÁCH GIÁO VIÊN OFFLINE (Chữ thường không dấu để so sánh chuẩn)
+        const OFFLINE_TEACHERS = [
+            'mai ngoc bao tran',
+            'phan trieu khiem',
+            'tran nu bao ngoc'
+        ];
+        // Cấu hình mức phụ cấp 50k
+        const ALLOWANCE_RATE = 50000;
+
         let globalDriveData = [];
         let globalTrendData = null; 
         let barChartTeacher = null;
         let pieChartStatus = null;
         let lineChartTrend = null;
+
+        // BỘ LỌC TÊN SIÊU ĐẲNG CỦA ADMIN YÊN
+        function removeAccents(str) {
+            return str.normalize('NFD')
+                      .replace(/[\u0300-\u036f]/g, '')
+                      .replace(/đ/g, 'd').replace(/Đ/g, 'D');
+        }
+
+        function normalizeName(name) {
+            if (!name) return "";
+            // Xóa tên file số thứ tự (ví dụ "07. Huỳnh Lệ Linh" -> "Huỳnh Lệ Linh")
+            let cleanName = name.replace(/^\s*[0-9]+[\.\-\s]*/, '');
+            // Đưa về chữ thường và xóa khoảng trắng hai đầu
+            cleanName = cleanName.trim().toLowerCase();
+            // Lọc toàn bộ dấu tiếng việt
+            cleanName = removeAccents(cleanName);
+            // Xóa mọi ký tự đặc biệt, dấu chấm phẩy, chỉ giữ lại chữ và số (Chống dính ký tự lạ)
+            cleanName = cleanName.replace(/[^a-z0-9\s]/g, '');
+            // Gom nhiều dấu cách thừa thành 1 dấu cách duy nhất, xóa cả dấu cách tàng hình
+            cleanName = cleanName.replace(/\s+/g, ' ');
+            return cleanName.trim();
+        }
+
+        // BỘ CHUẨN HOÁ NGÀY THÁNG ĐƯA MỌI ĐỊNH DẠNG VỀ CHUẨN VIỆT NAM (DD/MM/YYYY)
+        function formatStandardDate(dateStr) {
+            if (!dateStr) return "";
+            
+            const val = document.getElementById('monthSelector').value; // "YYYY-MM"
+            if(!val) return dateStr;
+            const partsVal = val.split('-');
+            const selMonth = partsVal[1];
+            const selYear = partsVal[0];
+
+            let parts = dateStr.trim().split(/[\/\-]/);
+            
+            if (parts.length === 3) {
+                let p1 = parts[0].padStart(2, '0');
+                let p2 = parts[1].padStart(2, '0');
+                let p3 = parts[2];
+                if (p3.length === 2) p3 = "20" + p3; // Xử lý nếu người dùng gõ năm 2 chữ số (VD: 26 -> 2026)
+                
+                // Tránh lỗi chuẩn Mỹ MM/DD/YYYY (Google Sheet tự đảo)
+                // Ví dụ: 04/11/2026 -> đổi lại thành 11/04/2026
+                if (p1 === selMonth && p2 !== selMonth) {
+                    return `${p2}/${p1}/${p3}`;
+                }
+                
+                // Mặc định: DD/MM/YYYY
+                return `${p1}/${p2}/${p3}`;
+            } else if (parts.length === 2) {
+                // Xử lý dạng gõ tắt DD/MM (VD: 14/4 -> 14/04/2026)
+                let p1 = parts[0].padStart(2, '0');
+                let p2 = parts[1].padStart(2, '0');
+                return `${p1}/${p2}/${selYear}`;
+            }
+            
+            return dateStr;
+        }
 
         async function startSync() {
             const errorBanner = document.getElementById('errorBanner');
@@ -716,6 +974,7 @@
                     globalTrendData = parsedCache.trend;
                     renderData();
                     renderCharts(formattedMonth, globalTrendData);
+                    renderAllowanceData(); // Vẽ bảng Phụ Cấp
                     
                     document.getElementById('lastUpdateTime').innerText = "Đang làm mới ngầm...";
                 } catch(e) {
@@ -738,18 +997,34 @@
                 }, 400);
 
                 const fetchUrl = `${API_URL}?month=${formattedMonth}`;
-                const response = await fetch(fetchUrl);
-                const textRaw = await response.text();
                 
+                let fetchRecordPromise = Promise.resolve(null);
+                if (RECORD_API_URL && RECORD_API_URL.trim() !== '') {
+                    fetchRecordPromise = fetch(`${RECORD_API_URL}?month=${formattedMonth}`)
+                        .then(res => {
+                            if (!res.ok) throw new Error("Lỗi HTTP: " + res.status);
+                            return res.text();
+                        })
+                        .catch(e => { 
+                            console.warn("Lỗi fetch API Record:", e); 
+                            return "ERROR_CORS_NETWORK"; 
+                        });
+                }
+
+                const [response, recordTextRaw] = await Promise.all([
+                    fetch(fetchUrl),
+                    fetchRecordPromise
+                ]);
+                
+                const textRaw = await response.text();
                 clearInterval(progressInterval);
 
                 let jsonResponse;
                 try {
                     jsonResponse = JSON.parse(textRaw);
                 } catch(e) {
-                    console.error("Lỗi parse JSON:", textRaw);
                     overlay.style.display = 'none';
-                    showError("LỖI PHÂN QUYỀN GOOGLE: Dashboard đang bị chặn.<br><br><b>Khắc phục:</b> Vào Apps Script > Quản lý bản triển khai > Chỉnh sửa (Bút chì) > Người truy cập: <b>Bất kỳ ai</b> > Phiên bản mới > Lưu.");
+                    showError("LỖI PHÂN QUYỀN API CHÍNH: Dashboard đang bị chặn.<br><b>Khắc phục:</b> Vào Apps Script > Quản lý bản triển khai > Chỉnh sửa (Bút chì) > Người truy cập: <b>Bất kỳ ai</b> > Phiên bản mới > Lưu.");
                     return;
                 }
 
@@ -757,36 +1032,86 @@
                 statusText.innerText = "Đồng bộ dữ liệu thành công!";
 
                 if (jsonResponse.status === "success") {
-                    localStorage.setItem(cacheKey, textRaw);
-                    
                     globalDriveData = jsonResponse.data;
                     globalTrendData = jsonResponse.trend; 
+
+                    if (recordTextRaw) {
+                        if (recordTextRaw === "ERROR_CORS_NETWORK") {
+                            showError("<b>⚠️ CẢNH BÁO API RECORD:</b> Website bị chặn quyền truy cập vào file Google Sheet Record. <br>Hãy kiểm tra lại xem chị đã cài <b>'Người truy cập: Bất kỳ ai (Anyone)'</b> chưa nhé.");
+                        } else {
+                            try {
+                                const recordJson = JSON.parse(recordTextRaw);
+                                
+                                if (recordJson.status === "error") {
+                                    showError("<b>⚠️ LỖI TỪ BÊN TRONG FILE SHEET RECORD:</b> " + recordJson.message);
+                                } else if(recordJson.status === "success" && recordJson.data) {
+                                    
+                                    // SO SÁNH GHÉP TÊN
+                                    globalDriveData.forEach(gv => {
+                                        if(gv.id !== "ERR") {
+                                            const nameMain = normalizeName(gv.name);
+                                            const nameFile = normalizeName(gv.file);
+                                            
+                                            const match = recordJson.data.find(r => {
+                                                const nameRecord = normalizeName(r.name);
+                                                if (!nameRecord) return false;
+                                                
+                                                // Tìm kiếm chéo cực mạnh (Tránh trường hợp sai khác 1 chữ)
+                                                const isMatch = (nameMain && (nameMain === nameRecord || nameMain.includes(nameRecord) || nameRecord.includes(nameMain))) || 
+                                                                (nameFile && (nameFile === nameRecord || nameFile.includes(nameRecord) || nameRecord.includes(nameFile)));
+                                                return isMatch;
+                                            });
+
+                                            if(match) {
+                                                gv.recordTotal = parseInt(match.recordTotal) || 0; 
+                                                gv.recordRow = match.row; 
+                                            } else {
+                                                gv.recordTotal = -1; // Đánh dấu Lệch Tên
+                                            }
+                                        }
+                                    });
+                                }
+                            } catch(e) { 
+                                if(recordTextRaw.includes("<html") || recordTextRaw.includes("Sign in")) {
+                                    showError("<b>⚠️ LỖI BẢO MẬT API RECORD:</b> File Sheet Record chưa được cấp quyền 'Bất kỳ ai'. Hệ thống đang bị Google chặn bắt đăng nhập!");
+                                } else {
+                                    showError("<b>⚠️ LỖI ĐỌC DỮ LIỆU RECORD:</b> API trả về dữ liệu bị hỏng (Không phải định dạng JSON chuẩn).");
+                                }
+                            }
+                        }
+                    }
+                    
+                    localStorage.setItem(cacheKey, JSON.stringify({ data: globalDriveData, trend: globalTrendData }));
                     
                     setTimeout(() => {
                         overlay.style.display = 'none';
                         renderData(); 
                         renderCharts(formattedMonth, globalTrendData); 
+                        renderAllowanceData(); // Vẽ bảng Phụ Cấp
                         const now = new Date();
                         document.getElementById('lastUpdateTime').innerText = now.getHours() + ":" + String(now.getMinutes()).padStart(2, '0') + " hôm nay";
                     }, 600);
                 } else {
                     overlay.style.display = 'none';
-                    showError("Kết nối được API nhưng lỗi Code: " + (jsonResponse.message || "Không xác định"));
+                    showError("Kết nối API chính báo lỗi: " + (jsonResponse.message || "Không xác định"));
                 }
 
             } catch (error) {
                 overlay.style.display = 'none';
                 if (!cachedRawData) {
-                    showError("LỖI LIÊN KẾT: Mạng nội bộ chặn hoặc link API của bạn bị sai (đảm bảo kết thúc bằng <b>/exec</b>).");
+                    showError("LỖI MẠNG: Không thể kết nối. Xin hãy kiểm tra lại kết nối Wifi hoặc VPN.");
                 }
-                console.error(error);
             }
         }
 
         function showError(messageHtml) {
             const errorBanner = document.getElementById('errorBanner');
             const errorMessage = document.getElementById('errorMessage');
-            errorMessage.innerHTML = messageHtml;
+            if(errorMessage.innerHTML === "") {
+                errorMessage.innerHTML = messageHtml;
+            } else {
+                errorMessage.innerHTML += "<br><br>" + messageHtml;
+            }
             errorBanner.classList.remove('hidden');
         }
 
@@ -808,6 +1133,81 @@
             }
         }
 
+        // ==========================================
+        // KHU VỰC VẼ BẢNG PHỤ CẤP ĐI LẠI
+        // ==========================================
+        function renderAllowanceData() {
+            const tbody = document.getElementById('allowanceTableBody');
+            tbody.innerHTML = '';
+            
+            let totalAllowanceAmount = 0;
+            let displayIndex = 0;
+
+            if (globalDriveData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-16 text-center text-gray-500 font-medium">Chưa có dữ liệu giáo viên trong tháng này.</td></tr>`;
+                return;
+            }
+
+            // Tiền tệ Format VNĐ
+            const formatter = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' });
+
+            globalDriveData.forEach((gv, index) => {
+                if (gv.id === "ERR" || !gv.details) return;
+
+                // Lọc xem tên Giáo viên này có thuộc danh sách Offline không
+                const normName = normalizeName(gv.name);
+                const normFile = normalizeName(gv.file);
+                
+                const isOfflineTeacher = OFFLINE_TEACHERS.some(offlineName => 
+                    (normName && normName.includes(offlineName)) || 
+                    (normFile && normFile.includes(offlineName))
+                );
+
+                if (!isOfflineTeacher) return; // Nếu không phải GV Offline thì bỏ qua
+
+                displayIndex++;
+
+                // Thuật toán gom nhóm ngày (Loại bỏ các ngày trùng lặp)
+                let uniqueDatesSet = new Set();
+                gv.details.forEach(row => {
+                    let d = row.date ? row.date.trim() : "";
+                    if(d !== "") {
+                        uniqueDatesSet.add(formatStandardDate(d)); // Áp dụng bộ chuẩn hoá ngày tháng
+                    }
+                });
+
+                const uniqueDaysCount = uniqueDatesSet.size;
+                const allowanceMoney = uniqueDaysCount * ALLOWANCE_RATE;
+                totalAllowanceAmount += allowanceMoney;
+
+                const tr = document.createElement('tr');
+                tr.className = `hover:bg-gray-50/80 transition-colors animate-slide-up group border-b border-gray-100`;
+                tr.style.animationDelay = `${displayIndex * 0.05}s`;
+
+                tr.innerHTML = `
+                    <td class="py-4 px-6 lg:px-8 text-center text-gray-400 font-bold">${displayIndex}</td>
+                    <td class="py-4 px-4 lg:px-6 font-bold text-beu-darkPurple">${gv.name || gv.file.replace(/^[0-9]+\.\s*/, '')}</td>
+                    <td class="py-4 px-4 lg:px-6 text-center">
+                        <span class="bg-blue-50 text-blue-600 border border-blue-200 px-3 py-1.5 rounded-xl font-black text-lg shadow-sm">${uniqueDaysCount} <span class="text-xs font-medium text-blue-500 uppercase ml-1">ngày</span></span>
+                    </td>
+                    <td class="py-4 px-4 lg:px-6 text-center font-bold text-gray-500">${formatter.format(ALLOWANCE_RATE)}/ngày</td>
+                    <td class="py-4 px-4 lg:px-6 text-center font-black text-beu-teal text-xl">${formatter.format(allowanceMoney)}</td>
+                    <td class="py-4 px-6 lg:px-8 text-center">
+                        <button onclick="openAllowanceModal(${index})" class="text-beu-lightTeal hover:text-white border border-beu-lightTeal hover:bg-beu-teal font-bold px-3 py-1.5 rounded-lg transition-all shadow-sm flex items-center gap-2 mx-auto text-xs sm:text-sm">
+                            <i class="fas fa-list-check text-xs"></i> <span>Xem Ngày Tới HV</span>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            if (displayIndex === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-16 text-center text-gray-500 font-medium">Tháng này không có Giáo Viên Offline nào được chấm công.</td></tr>`;
+            }
+
+            document.getElementById('totalAllowanceAmount').innerText = formatter.format(totalAllowanceAmount);
+        }
+
         function renderData() {
             const tbody = document.getElementById('teachersTableBody');
             tbody.innerHTML = '';
@@ -817,12 +1217,11 @@
             let displayIndex = 0;
 
             if (globalDriveData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="py-16 text-center text-gray-500 font-medium">Không tìm thấy file nào hoặc thư mục trống.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="9" class="py-16 text-center text-gray-500 font-medium">Không tìm thấy file nào hoặc thư mục trống.</td></tr>`;
                 return;
             }
 
             globalDriveData.forEach((gv, index) => {
-                // Tự động ẩn các Giáo Viên chưa có Tab
                 if (gv.file && gv.file.includes("Chưa có Tab")) return;
 
                 displayIndex++;
@@ -839,6 +1238,33 @@
                     progressBadge = `<span class="bg-yellow-100 border border-yellow-200 text-yellow-700 py-1.5 px-3 rounded-lg text-xs font-bold w-24 inline-block shadow-sm">${gv.approved}/${gv.total} (${pct}%)</span>`;
                 } else {
                     progressBadge = `<span class="bg-green-100 border border-green-200 text-green-700 py-1.5 px-3 rounded-lg text-xs font-bold w-24 inline-block shadow-sm"><i class="fas fa-check mr-1"></i> ${gv.total}</span>`;
+                }
+
+                let recordHtml = '<span class="text-gray-400 font-bold text-[10px] uppercase border border-gray-200 bg-gray-50 px-3 py-1.5 rounded-lg inline-block whitespace-nowrap shadow-sm">Chờ Data</span>';
+                
+                if (gv.recordTotal !== undefined) {
+                    let targetUrl = RECORD_SHEET_URL;
+                    if (gv.recordRow) {
+                        // Tái tạo link cực kỳ sạch sẽ và chính xác cho Google Sheet
+                        let fileIdMatch = RECORD_SHEET_URL.match(/\/d\/([a-zA-Z0-9-_]+)/);
+                        let gidMatch = RECORD_SHEET_URL.match(/gid=([0-9]+)/);
+                        
+                        if (fileIdMatch && gidMatch) {
+                            targetUrl = `https://docs.google.com/spreadsheets/d/${fileIdMatch[1]}/edit#gid=${gidMatch[1]}&range=D${gv.recordRow}`;
+                        } else {
+                            targetUrl = RECORD_SHEET_URL.split('?')[0].split('#')[0] + '#range=D' + gv.recordRow;
+                        }
+                    }
+
+                    if (gv.recordTotal === -1) {
+                        // HIỆN RÕ HỆ THỐNG ĐANG TÌM TÊN GÌ NẾU LỖI
+                        let tenTimKiem = normalizeName(gv.name);
+                        recordHtml = `<span class="text-yellow-600 font-bold text-[10px] bg-yellow-50 border border-yellow-200 px-3 py-1.5 rounded-lg shadow-sm uppercase whitespace-nowrap cursor-help" title="Web đang tìm '${tenTimKiem}' nhưng không thấy bên File Record. Chị xem có bị lệch gì không nhé!">Lệch Tên</span>`;
+                    } else if (gv.recordTotal === gv.total) {
+                        recordHtml = `<a href="${targetUrl}" target="_blank" class="text-[#15803d] font-black text-lg hover:text-[#166534] transition-colors cursor-pointer focus:outline-none flex items-center justify-center mx-auto gap-1.5 w-max" title="Khớp 100%. Bấm để kiểm tra file Record"><i class="fas fa-check-circle text-sm"></i><span class="underline underline-offset-4 decoration-2">${gv.recordTotal}</span></a>`;
+                    } else {
+                        recordHtml = `<a href="${targetUrl}" target="_blank" class="text-[#dc2626] font-black text-lg bg-[#fef2f2] border border-[#fecaca] px-4 py-1.5 rounded-xl shadow-sm hover:bg-[#fee2e2] transition-all cursor-pointer focus:outline-none mx-auto block w-max" title="Lệch công. Bấm để kiểm tra file Record">${gv.recordTotal}</a>`;
+                    }
                 }
 
                 const tr = document.createElement('tr');
@@ -860,6 +1286,7 @@
                     </td>
                     <td class="py-4 px-4 lg:px-6 font-bold text-beu-purple">${gv.name}</td>
                     <td class="py-4 px-4 lg:px-6 text-center font-black text-gray-700 text-base">${gv.total}</td>
+                    <td class="py-4 px-4 lg:px-6 text-center bg-beu-lightTeal/5 border-l border-r border-gray-50">${gv.id === "ERR" ? "-" : recordHtml}</td>
                     <td class="py-4 px-4 lg:px-6 text-center">${gv.id === "ERR" ? '<span class="text-red-500 font-bold bg-red-100 px-2 py-1 rounded">Lỗi ID</span>' : progressBadge}</td>
                     <td class="py-4 px-4 lg:px-6 text-center">
                         ${gv.id === "ERR" ? '<i class="fas fa-exclamation-triangle text-red-500 text-lg"></i>' : '<i class="fas fa-check-circle text-green-500 text-lg opacity-80"></i>'}
@@ -883,7 +1310,6 @@
             document.getElementById('pieEmptyState').style.display = 'none';
             document.getElementById('lineEmptyState').style.display = 'none';
 
-            // Lọc bỏ lỗi và các Giáo Viên chưa có Tab để không vẽ vào biểu đồ
             const activeTeachers = globalDriveData.filter(g => g.id !== "ERR" && !(g.file && g.file.includes("Chưa có Tab"))).sort((a,b) => b.total - a.total);
             const teacherNames = activeTeachers.map(g => g.name);
             const teacherTotals = activeTeachers.map(g => g.total);
@@ -1020,7 +1446,7 @@
             if(gv.id === "ERR") return;
 
             document.getElementById('modalTitle').innerText = `${gv.file}`;
-            document.getElementById('modalTeacherName').innerText = gv.name;
+            document.getElementById('modalTeacherName').innerText = gv.name || gv.file.replace(/^[0-9]+\.\s*/, '');
             document.getElementById('modalSheetLink').href = gv.sheetLink;
 
             const tbody = document.getElementById('modalTableBody');
@@ -1045,7 +1471,7 @@
                     tr.className = "hover:bg-beu-teal/5 transition-colors";
                     tr.innerHTML = `
                         <td class="py-3 px-4 border-r border-gray-100 text-center font-bold text-gray-500">${row.stt || (rIdx+1)}</td>
-                        <td class="py-3 px-4 border-r border-gray-100 text-center font-medium min-w-[100px]">${row.date}</td>
+                        <td class="py-3 px-4 border-r border-gray-100 text-center font-medium min-w-[100px]">${formatStandardDate(row.date)}</td>
                         <td class="py-3 px-4 border-r border-gray-100 text-center font-bold text-beu-purple min-w-[120px]">${row.class}</td>
                         <td class="py-3 px-4 border-r border-gray-100 text-center font-medium">${row.session}</td>
                         <td class="py-3 px-6 border-r border-gray-100 text-gray-700 font-medium leading-relaxed">${row.lesson}</td>
@@ -1058,6 +1484,51 @@
             }
 
             document.getElementById('detailModal').classList.add('active');
+        }
+
+        // Mở bảng kê chi tiết các ngày đi dạy
+        function openAllowanceModal(index) {
+            const gv = globalDriveData[index];
+            if(gv.id === "ERR" || !gv.details) return;
+
+            document.getElementById('allowanceModalName').innerText = gv.name || gv.file.replace(/^[0-9]+\.\s*/, '');
+            document.getElementById('allowanceModalSheetLink').href = gv.sheetLink || '#';
+            
+            // Lọc ra các ngày duy nhất để hiển thị
+            let uniqueDatesSet = new Set();
+            gv.details.forEach(row => {
+                let d = row.date ? row.date.trim() : "";
+                if(d !== "") uniqueDatesSet.add(formatStandardDate(d)); // Áp dụng bộ chuẩn hoá ngày tháng
+            });
+            
+            const uniqueDatesArray = Array.from(uniqueDatesSet);
+            document.getElementById('allowanceModalCount').innerText = uniqueDatesArray.length;
+
+            const tbody = document.getElementById('allowanceModalTableBody');
+            tbody.innerHTML = '';
+            
+            const formatter = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' });
+
+            if (uniqueDatesArray.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="py-12 text-center text-gray-500 font-medium">Giáo Viên chưa phát sinh ngày dạy nào trong tháng.</td></tr>`;
+            } else {
+                uniqueDatesArray.forEach((dateStr, rIdx) => {
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-beu-teal/5 transition-colors";
+                    tr.innerHTML = `
+                        <td class="py-4 px-4 border-r border-gray-100 text-center font-bold text-gray-400">${rIdx + 1}</td>
+                        <td class="py-4 px-6 border-r border-gray-100 font-bold text-beu-darkPurple text-lg"><i class="far fa-calendar-alt text-beu-teal mr-2"></i> ${dateStr}</td>
+                        <td class="py-4 px-4 text-center bg-green-50/30 font-black text-green-600">${formatter.format(ALLOWANCE_RATE)}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            document.getElementById('allowanceModal').classList.add('active');
+        }
+
+        function closeAllowanceModal() {
+            document.getElementById('allowanceModal').classList.remove('active');
         }
 
         function closeModal() {
