@@ -1289,32 +1289,41 @@
             tbody.innerHTML = '';
             let displayIndex = 0;
 
-            if (globalDriveData.length === 0) {
+            if (globalDriveData.length === 0 && globalRecordData.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="py-16 text-center text-gray-500 font-medium">Không có dữ liệu để đối chiếu.</td></tr>`;
                 return;
             }
 
-            globalDriveData.forEach((gv) => {
-                if (gv.id === "ERR" || !gv.details || (gv.file && gv.file.includes("Chưa có Tab"))) return;
+            let processedRecordTeachers = new Set();
 
-                let mainClassCounts = {};
-                gv.details.forEach(row => {
-                    let cName = row.class ? row.class.trim() : "Chưa có tên lớp";
-                    if(cName !== "") {
-                        let normCName = normalizeName(cName);
-                        // Nhóm các lớp bằng tên đã chuẩn hóa
-                        mainClassCounts[normCName] = mainClassCounts[normCName] || { name: cName, count: 0 };
-                        mainClassCounts[normCName].count += 1;
-                    }
-                });
+            globalDriveData.forEach((gv) => {
+                if (gv.id === "ERR" || (gv.file && gv.file.includes("Chưa có Tab"))) return;
+
+                // TẬP HỢP TẤT CẢ LỚP VÀ NGÀY TRONG FILE GỐC (LẤY TÊN GỐC LÀM CHUẨN)
+                let mainClassesInfo = {};
+                if (gv.details && gv.details.length > 0) {
+                    gv.details.forEach((row, index) => {
+                        let cName = row.class ? row.class.trim() : "Chưa có tên lớp";
+                        if(cName !== "") {
+                            if(!mainClassesInfo[cName]) mainClassesInfo[cName] = { name: cName, count: 0, dates: [] };
+                            mainClassesInfo[cName].count += 1;
+                            
+                            let dateVal = row.date ? formatStandardDate(row.date) : `Dòng ${row.stt || (index+1)}: Quên nhập ngày`;
+                            mainClassesInfo[cName].dates.push(dateVal);
+                        }
+                    });
+                }
 
                 let recordClasses = [];
                 if (globalRecordData && globalRecordData.length > 0) {
                     let match = globalRecordData.find(r => isTeacherMatch(gv.name, gv.file, r.name));
-                    if (match && match.classes) {
-                        recordClasses = match.classes; 
+                    if (match) {
+                        recordClasses = match.classes || []; 
+                        processedRecordTeachers.add(match.name);
                     }
                 }
+
+                if (Object.keys(mainClassesInfo).length === 0 && recordClasses.length === 0) return;
 
                 // TẠO LINK CHUẨN ĐỂ CLICK VÀO SỐ 
                 let mainLink = gv.sheetLink || '#';
@@ -1329,36 +1338,72 @@
                     }
                 }
 
-                Object.keys(mainClassCounts).forEach(normKey => {
+                let processedRecordClassNames = new Set();
+
+                // 1. DUYỆT VÀ GỘP CÁC LỚP TRONG FILE GỐC VỚI FILE RECORD
+                Object.keys(mainClassesInfo).forEach(className => {
                     displayIndex++;
-                    let className = mainClassCounts[normKey].name;
-                    let mainCount = mainClassCounts[normKey].count;
+                    let mainCount = mainClassesInfo[className].count;
+                    let mainDates = mainClassesInfo[className].dates;
+                    let normClassName = normalizeName(className);
                     
                     let recordCount = 0;
+                    let recordDates = [];
+                    // TÌM LỚP BÊN RECORD CÓ TÊN GIỐNG HOẶC CHỨA TÊN LỚP BÊN FILE GỐC (GỘP LỚP)
                     let foundRecordClass = recordClasses.find(rc => {
                         let nRC = normalizeName(rc.className);
-                        return nRC.includes(normKey) || normKey.includes(nRC) || nRC === normKey;
+                        return nRC.includes(normClassName) || normClassName.includes(nRC) || nRC === normClassName;
                     });
                     
                     if (foundRecordClass) {
-                        recordCount = foundRecordClass.count;
+                        processedRecordClassNames.add(foundRecordClass.className);
+                        recordCount = foundRecordClass.count || 0;
+                        if (foundRecordClass.recordDates) {
+                            const val = document.getElementById('monthSelector').value;
+                            const partsVal = val.split('-');
+                            const selMonth = partsVal[1];
+                            const selYear = partsVal[0];
+
+                            recordDates = foundRecordClass.recordDates.map(d => {
+                                let dayStr = String(d).split('/')[0].replace(/[^0-9]/g, '');
+                                if(dayStr) {
+                                    return `${dayStr.padStart(2, '0')}/${selMonth}/${selYear}`;
+                                }
+                                return `Ngày ${d}`;
+                            });
+                        }
                     }
 
+                    // KIỂM TRA LỆCH NGÀY
+                    let isDateMismatch = false;
+                    let mainDateCounts = {};
+                    mainDates.forEach(d => mainDateCounts[d] = (mainDateCounts[d] || 0) + 1);
+                    let recordDateCounts = {};
+                    recordDates.forEach(d => recordDateCounts[d] = (recordDateCounts[d] || 0) + 1);
+
+                    let allDates = Array.from(new Set([...mainDates, ...recordDates]));
+                    allDates.forEach(d => {
+                        if ((mainDateCounts[d] || 0) !== (recordDateCounts[d] || 0)) {
+                            isDateMismatch = true;
+                        }
+                    });
+
                     let statusHtml = "";
+                    let gvIndex = globalDriveData.indexOf(gv);
+                    let safeClassName = className.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+
                     if (recordClasses.length === 0) {
                         statusHtml = `<span class="bg-gray-100 text-gray-500 px-3 py-1 rounded-lg text-[11px] font-bold uppercase shadow-sm cursor-help" title="Không tìm thấy chi tiết lớp nào. Hãy kiểm tra Cột C và Cột E trong file Record!">Chờ Data Record</span>`;
                     } else if (!foundRecordClass) {
                         statusHtml = `<span class="bg-yellow-50 border border-yellow-200 text-yellow-600 px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase shadow-sm cursor-help" title="Tìm thấy Giáo Viên nhưng không thấy Tên Lớp này trong File Record. Chị kiểm tra xem tên lớp có bị gõ sai không nhé!"><i class="fas fa-search-minus mr-1"></i> Lệch Tên Lớp</span>`;
-                    } else if (mainCount === recordCount) {
-                        statusHtml = `<span class="bg-green-100 border border-green-200 text-green-700 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm"><i class="fas fa-check-circle mr-1"></i> Khớp 100%</span>`;
-                    } else {
+                    } else if (mainCount !== recordCount) {
                         let diff = mainCount - recordCount;
                         let text = diff > 0 ? `Thiếu ${diff} công` : `Dư ${Math.abs(diff)} công`;
-                        let gvIndex = globalDriveData.indexOf(gv);
-                        let safeClassName = className.replace(/'/g, "\\'").replace(/"/g, "&quot;");
-                        
-                        // NÚT XEM CHI TIẾT NGÀY BỊ LỆCH
                         statusHtml = `<button onclick="openDiffModal(${gvIndex}, '${safeClassName}')" class="bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition-colors flex items-center gap-1.5 mx-auto" title="Bấm để xem chi tiết ngày lệch"><i class="fas fa-search-plus"></i> Xem Lệch (${text})</button>`;
+                    } else if (isDateMismatch) {
+                        statusHtml = `<button onclick="openDiffModal(${gvIndex}, '${safeClassName}')" class="bg-orange-50 hover:bg-orange-100 border border-orange-300 text-orange-600 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition-colors flex items-center gap-1.5 mx-auto animate-pulse" title="Tổng số khớp nhưng bị lệch chi tiết ngày dạy"><i class="fas fa-calendar-times"></i> Lệch Ngày Dạy</button>`;
+                    } else {
+                        statusHtml = `<span class="bg-green-100 border border-green-200 text-green-700 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm"><i class="fas fa-check-circle mr-1"></i> Khớp 100%</span>`;
                     }
 
                     const tr = document.createElement('tr');
@@ -1379,7 +1424,89 @@
                     `;
                     tbody.appendChild(tr);
                 });
+
+                // 2. HIỂN THỊ CÁC LỚP CÓ TRONG RECORD NHƯNG KHÔNG CÓ TRONG FILE GỐC (DƯ RA BÊN RECORD)
+                recordClasses.forEach(rc => {
+                    if (!processedRecordClassNames.has(rc.className)) {
+                        displayIndex++;
+                        let className = rc.className;
+                        let recordCount = rc.count || 0;
+                        
+                        let safeClassName = className.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                        let gvIndex = globalDriveData.indexOf(gv);
+                        
+                        // Ở đây số Gốc = 0, số Record = recordCount
+                        let diff = 0 - recordCount; // Dư
+                        let text = `Dư ${Math.abs(diff)} công`;
+                        
+                        let statusHtml = `<button onclick="openDiffModal(${gvIndex}, '${safeClassName}')" class="bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase shadow-sm cursor-help transition-colors flex items-center gap-1.5 mx-auto" title="Lớp này có trong Record nhưng không có trong File Gốc!"><i class="fas fa-exclamation-circle mr-1"></i> Gốc Bỏ Trống</button>`;
+
+                        const tr = document.createElement('tr');
+                        tr.className = `hover:bg-gray-50/80 transition-colors animate-slide-up border-b border-gray-100 bg-red-50/20`;
+                        tr.style.animationDelay = `${(displayIndex % 20) * 0.05}s`;
+
+                        tr.innerHTML = `
+                            <td class="py-4 px-6 lg:px-8 text-center text-gray-400 font-bold">${displayIndex}</td>
+                            <td class="py-4 px-4 lg:px-6 font-bold text-beu-darkPurple">${gv.name || gv.file.replace(/^[0-9]+\.\s*/, '')}</td>
+                            <td class="py-4 px-4 lg:px-6 font-bold text-beu-purple text-sm">${className}</td>
+                            <td class="py-4 px-4 lg:px-6 text-center font-black text-gray-700 text-lg">
+                                <a href="${mainLink}" target="_blank" class="hover:text-beu-teal hover:underline decoration-2 underline-offset-4 transition-all" title="Mở File Gốc của Giáo Viên">0</a>
+                            </td>
+                            <td class="py-4 px-4 lg:px-6 text-center font-black text-beu-teal text-lg bg-beu-lightTeal/5 border-l border-r border-gray-50">
+                                <a href="${recordLink}" target="_blank" class="hover:text-beu-darkTeal hover:underline decoration-2 underline-offset-4 transition-all" title="Mở File Record để kiểm tra">${recordCount}</a>
+                            </td>
+                            <td class="py-4 px-6 lg:px-8 text-center">${statusHtml}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    }
+                });
+
             });
+
+            // 3. Xử lý các Giáo viên CÓ trong Record nhưng KHÔNG CÓ File Gốc
+            if (globalRecordData && globalRecordData.length > 0) {
+                globalRecordData.forEach(r => {
+                    if (!processedRecordTeachers.has(r.name)) {
+                        if (!r.classes || r.classes.length === 0) return;
+
+                        // TẠO LINK CHUẨN ĐỂ CLICK VÀO SỐ
+                        let recordLinkMissing = RECORD_SHEET_URL;
+                        if (r.row) {
+                            let fileIdMatch = RECORD_SHEET_URL.match(/\/d\/([a-zA-Z0-9-_]+)/);
+                            let gidMatch = RECORD_SHEET_URL.match(/gid=([0-9]+)/);
+                            if (fileIdMatch && gidMatch) {
+                                recordLinkMissing = `https://docs.google.com/spreadsheets/d/${fileIdMatch[1]}/edit#gid=${gidMatch[1]}&range=C${r.row}`;
+                            } else {
+                                recordLinkMissing = RECORD_SHEET_URL.split('?')[0].split('#')[0] + '#range=C' + r.row;
+                            }
+                        }
+
+                        r.classes.forEach(rc => {
+                            displayIndex++;
+                            let className = rc.className;
+                            let recordCount = rc.count || 0;
+
+                            let statusHtml = `<span class="bg-red-50 border border-red-200 text-red-600 px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase shadow-sm cursor-help" title="Không tìm thấy File Gốc (File Cá Nhân) của Giáo viên này!"><i class="fas fa-file-excel mr-1"></i> Thiếu File Gốc</span>`;
+
+                            const tr = document.createElement('tr');
+                            tr.className = `hover:bg-gray-50/80 transition-colors animate-slide-up border-b border-gray-100 bg-red-50/30`;
+                            tr.style.animationDelay = `${(displayIndex % 20) * 0.05}s`;
+
+                            tr.innerHTML = `
+                                <td class="py-4 px-6 lg:px-8 text-center text-gray-400 font-bold">${displayIndex}</td>
+                                <td class="py-4 px-4 lg:px-6 font-bold text-red-600">${r.name}</td>
+                                <td class="py-4 px-4 lg:px-6 font-bold text-beu-purple text-sm">${className}</td>
+                                <td class="py-4 px-4 lg:px-6 text-center font-black text-gray-400 text-lg"><span title="Chưa có File Gốc">0</span></td>
+                                <td class="py-4 px-4 lg:px-6 text-center font-black text-beu-teal text-lg bg-beu-lightTeal/5 border-l border-r border-gray-50">
+                                    <a href="${recordLinkMissing}" target="_blank" class="hover:text-beu-darkTeal hover:underline decoration-2 underline-offset-4 transition-all" title="Mở File Record để kiểm tra">${recordCount}</a>
+                                </td>
+                                <td class="py-4 px-6 lg:px-8 text-center">${statusHtml}</td>
+                            `;
+                            tbody.appendChild(tr);
+                        });
+                    }
+                });
+            }
             
             if(displayIndex === 0) {
                  tbody.innerHTML = `<tr><td colspan="6" class="py-16 text-center text-gray-500 font-medium">Chưa có dữ liệu lớp học để đối chiếu.</td></tr>`;
@@ -1691,12 +1818,14 @@
             document.getElementById('diffModalTeacherName').innerText = gv.name || gv.file.replace(/^[0-9]+\.\s*/, '');
             document.getElementById('diffModalClassName').innerText = className;
 
-            // 1. Lấy danh sách ngày TỪ FILE GỐC
+            // 1. Lấy danh sách ngày TỪ FILE GỐC (Dùng tính năng chứa tên/gộp lớp để lọc)
             let mainDates = [];
             if(gv.details && gv.details.length > 0) {
                 gv.details.forEach((row, index) => {
                     let cName = row.class ? row.class.trim() : "Chưa có tên lớp";
-                    if(normalizeName(cName) === normClassName) {
+                    let normCName = normalizeName(cName);
+                    // Lọc tương tự như lúc render: lớp bên Gốc có chứa tên hoặc ngược lại
+                    if(normCName.includes(normClassName) || normClassName.includes(normCName) || normCName === normClassName) {
                         let dateVal = row.date ? formatStandardDate(row.date) : `Dòng ${row.stt || (index+1)}: Quên nhập ngày`;
                         mainDates.push(dateVal);
                     }
@@ -1742,7 +1871,7 @@
                 warningContainer.innerHTML = '';
             }
 
-            // 3. ĐẾM VÀ SO SÁNH CHI TIẾT TỪNG NGÀY
+            // 3. ĐẾM VÀ SO SÁNH CHI TIẾT TỪNG NGÀY (Xử lý cả vụ 1 ngày dạy 2 buổi)
             let mainDateCounts = {};
             mainDates.forEach(d => mainDateCounts[d] = (mainDateCounts[d] || 0) + 1);
 
