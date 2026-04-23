@@ -1439,7 +1439,7 @@
                         let diff = 0 - recordCount; // Dư
                         let text = `Dư ${Math.abs(diff)} công`;
                         
-                        let statusHtml = `<button onclick="openDiffModal(${gvIndex}, '${safeClassName}')" class="bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase shadow-sm cursor-help transition-colors flex items-center gap-1.5 mx-auto" title="Lớp này có trong Record nhưng không có trong File Gốc!"><i class="fas fa-exclamation-circle mr-1"></i> Gốc Bỏ Trống</button>`;
+                        let statusHtml = `<button onclick="openDiffModal(${gvIndex}, '${safeClassName}')" class="bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase shadow-sm cursor-help transition-colors flex items-center gap-1.5 mx-auto" title="Lớp này có trong Record nhưng không có trong File Gốc!"><i class="fas fa-exclamation-circle mr-1"></i> GV chưa chấm công</button>`;
 
                         const tr = document.createElement('tr');
                         tr.className = `hover:bg-gray-50/80 transition-colors animate-slide-up border-b border-gray-100 bg-red-50/20`;
