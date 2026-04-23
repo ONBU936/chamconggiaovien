@@ -764,6 +764,9 @@
                 </button>
             </div>
             
+            <!-- THÊM CONTAINER CẢNH BÁO LỖI -->
+            <div id="diffWarningBannerContainer" class="px-6 lg:px-8 pt-6 pb-0 bg-gray-50 empty:hidden"></div>
+            
             <div class="p-6 lg:p-8 overflow-y-auto flex-1 bg-gray-50 flex flex-col md:flex-row gap-6">
                 <!-- Cột 1: Thiếu -->
                 <div class="flex-1 bg-white rounded-2xl p-5 border border-red-100 shadow-sm flex flex-col h-full">
@@ -1038,15 +1041,15 @@
 
         // BỘ CHUẨN HOÁ NGÀY THÁNG ĐƯA MỌI ĐỊNH DẠNG VỀ CHUẨN VIỆT NAM (DD/MM/YYYY)
         function formatStandardDate(dateStr) {
-            if (!dateStr) return "";
+            if (!dateStr) return "Không có ngày"; // <-- UPDATE
             
             const val = document.getElementById('monthSelector').value; // "YYYY-MM"
-            if(!val) return dateStr;
+            if(!val) return String(dateStr);
             const partsVal = val.split('-');
             const selMonth = partsVal[1];
             const selYear = partsVal[0];
 
-            let parts = dateStr.trim().split(/[\/\-]/);
+            let parts = String(dateStr).trim().split(/[\/\-]/);
             
             if (parts.length === 3) {
                 let p1 = parts[0].padStart(2, '0');
@@ -1064,10 +1067,18 @@
                 // Xử lý dạng gõ tắt DD/MM (VD: 14/4 -> 14/04/2026)
                 let p1 = parts[0].padStart(2, '0');
                 let p2 = parts[1].padStart(2, '0');
+                // Tránh trường hợp nhập mm/yyyy thay vì dd/mm
+                if (p2.length === 4) return `01/${p1}/${p2}`;
                 return `${p1}/${p2}/${selYear}`;
             }
             
-            return dateStr;
+            // Xử lý nếu chỉ gõ mỗi 1 con số (VD: gõ "15" thay vì "15/04")
+            let singleDay = String(dateStr).replace(/[^0-9]/g, '');
+            if (singleDay.length > 0 && singleDay.length <= 2) {
+                return `${singleDay.padStart(2, '0')}/${selMonth}/${selYear}`;
+            }
+            
+            return String(dateStr);
         }
 
         async function startSync() {
@@ -1290,7 +1301,10 @@
                 gv.details.forEach(row => {
                     let cName = row.class ? row.class.trim() : "Chưa có tên lớp";
                     if(cName !== "") {
-                        mainClassCounts[cName] = (mainClassCounts[cName] || 0) + 1;
+                        let normCName = normalizeName(cName);
+                        // Nhóm các lớp bằng tên đã chuẩn hóa
+                        mainClassCounts[normCName] = mainClassCounts[normCName] || { name: cName, count: 0 };
+                        mainClassCounts[normCName].count += 1;
                     }
                 });
 
@@ -1315,15 +1329,15 @@
                     }
                 }
 
-                Object.keys(mainClassCounts).forEach(className => {
+                Object.keys(mainClassCounts).forEach(normKey => {
                     displayIndex++;
-                    let mainCount = mainClassCounts[className];
-                    let normClassName = normalizeName(className);
+                    let className = mainClassCounts[normKey].name;
+                    let mainCount = mainClassCounts[normKey].count;
                     
                     let recordCount = 0;
                     let foundRecordClass = recordClasses.find(rc => {
                         let nRC = normalizeName(rc.className);
-                        return nRC.includes(normClassName) || normClassName.includes(nRC) || nRC === normClassName;
+                        return nRC.includes(normKey) || normKey.includes(nRC) || nRC === normKey;
                     });
                     
                     if (foundRecordClass) {
@@ -1680,15 +1694,18 @@
             // 1. Lấy danh sách ngày TỪ FILE GỐC
             let mainDates = [];
             if(gv.details && gv.details.length > 0) {
-                gv.details.forEach(row => {
-                    if(normalizeName(row.class) === normClassName && row.date) {
-                        mainDates.push(formatStandardDate(row.date));
+                gv.details.forEach((row, index) => {
+                    let cName = row.class ? row.class.trim() : "Chưa có tên lớp";
+                    if(normalizeName(cName) === normClassName) {
+                        let dateVal = row.date ? formatStandardDate(row.date) : `Dòng ${row.stt || (index+1)}: Quên nhập ngày`;
+                        mainDates.push(dateVal);
                     }
                 });
             }
 
             // 2. Lấy danh sách ngày TỪ FILE RECORD
             let recordDates = [];
+            let recordTotalTyped = 0;
             if (globalRecordData && globalRecordData.length > 0) {
                 let match = globalRecordData.find(r => isTeacherMatch(gv.name, gv.file, r.name));
                 if (match && match.classes) {
@@ -1696,21 +1713,36 @@
                         let nRC = normalizeName(rc.className);
                         return nRC.includes(normClassName) || normClassName.includes(nRC) || nRC === normClassName;
                     });
-                    if (foundRecordClass && foundRecordClass.recordDates) {
-                        const val = document.getElementById('monthSelector').value; // "YYYY-MM"
-                        const partsVal = val.split('-');
-                        const selMonth = partsVal[1];
-                        const selYear = partsVal[0];
+                    if (foundRecordClass) {
+                        recordTotalTyped = foundRecordClass.count || 0;
+                        if(foundRecordClass.recordDates) {
+                            const val = document.getElementById('monthSelector').value; // "YYYY-MM"
+                            const partsVal = val.split('-');
+                            const selMonth = partsVal[1];
+                            const selYear = partsVal[0];
 
-                        recordDates = foundRecordClass.recordDates.map(d => {
-                            let day = String(d).replace(/[^0-9]/g, '').padStart(2, '0');
-                            return `${day}/${selMonth}/${selYear}`;
-                        });
+                            recordDates = foundRecordClass.recordDates.map(d => {
+                                let dayStr = String(d).split('/')[0].replace(/[^0-9]/g, '');
+                                if(dayStr) {
+                                    let day = dayStr.padStart(2, '0');
+                                    return `${day}/${selMonth}/${selYear}`;
+                                }
+                                return `Ngày ${d}`;
+                            });
+                        }
                     }
                 }
             }
 
-            // 3. ĐẾM VÀ SO SÁNH CHI TIẾT TỪNG NGÀY (Xử lý cả vụ 1 ngày dạy 2 buổi)
+            // Cảnh báo nếu số đếm tay khác số tick trên Record
+            const warningContainer = document.getElementById('diffWarningBannerContainer');
+            if (recordTotalTyped > 0 && recordTotalTyped !== recordDates.length) {
+                warningContainer.innerHTML = `<div class="bg-orange-50 border border-orange-200 text-orange-700 p-4 rounded-xl shadow-sm text-sm font-bold flex items-start gap-3"><i class="fas fa-exclamation-triangle text-2xl mt-0.5"></i> <div>CẢNH BÁO TỪ FILE RECORD:<br><span class="font-medium">Người nhập liệu đang gõ tay Tổng Cộng là <b class="text-xl">${recordTotalTyped}</b>, nhưng số lượng dấu tick (v) đếm được trên lịch thực tế lại là <b class="text-xl">${recordDates.length}</b>. Hãy kiểm tra lại file Record!</span></div></div>`;
+            } else {
+                warningContainer.innerHTML = '';
+            }
+
+            // 3. ĐẾM VÀ SO SÁNH CHI TIẾT TỪNG NGÀY
             let mainDateCounts = {};
             mainDates.forEach(d => mainDateCounts[d] = (mainDateCounts[d] || 0) + 1);
 
