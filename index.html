@@ -768,13 +768,13 @@
                 <!-- Cột 1: Thiếu -->
                 <div class="flex-1 bg-white rounded-2xl p-5 border border-red-100 shadow-sm flex flex-col h-full">
                     <h4 class="text-red-600 font-bold mb-1 flex items-center gap-2 text-lg"><i class="fas fa-minus-circle"></i> Bị đếm THIẾU trong Record</h4>
-                    <p class="text-xs text-gray-500 mb-4 font-medium">(File Giáo Viên có báo cáo dạy nhưng File Record bị sót)</p>
+                    <p class="text-xs text-gray-500 mb-4 font-medium">(File gốc có báo cáo dạy nhưng Record bị sót)</p>
                     <ul id="diffMissingList" class="space-y-2 flex-1 overflow-y-auto pr-2"></ul>
                 </div>
                 <!-- Cột 2: Dư -->
                 <div class="flex-1 bg-white rounded-2xl p-5 border border-yellow-200 shadow-sm flex flex-col h-full">
                     <h4 class="text-yellow-600 font-bold mb-1 flex items-center gap-2 text-lg"><i class="fas fa-plus-circle"></i> Bị đếm DƯ trong Record</h4>
-                    <p class="text-xs text-gray-500 mb-4 font-medium">(Không có trong File Giáo Viên nhưng file Record lại đếm)</p>
+                    <p class="text-xs text-gray-500 mb-4 font-medium">(Không có trong File Gốc nhưng Record lại đếm)</p>
                     <ul id="diffExtraList" class="space-y-2 flex-1 overflow-y-auto pr-2"></ul>
                 </div>
             </div>
@@ -970,7 +970,7 @@
             }
         }
 
-        const API_URL = 'https://script.google.com/macros/s/AKfycbzJiwa0yvQRbMygBFfLxx293eDCF0feQGPJ3PWSdkxMD3Ar1-vuHjDsHalMzSL5lMYzlw/exec'; 
+        const API_URL = 'https://script.google.com/macros/s/AKfycbwNP-AGkhIXf2z116idhsHFggknWmBcShDSoLxj2oKAW7cAFGbUmyIZ9inx1_SSiE4/exec'; 
         const RECORD_API_URL = 'https://script.google.com/macros/s/AKfycbw4vmNFCwtheFAdcReE9jy41tbOjiNyh_-7UgTVlRZX1thTRtkRTyYQP9pCrE52AK1q/exec'; 
         const RECORD_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1UQBmzTrNllOUyMUkRLCCsijgCQhHKZkq61Mc7iQuEro/edit?gid=1940195197#gid=1940195197';
 
@@ -1302,6 +1302,19 @@
                     }
                 }
 
+                // TẠO LINK CHUẨN ĐỂ CLICK VÀO SỐ 
+                let mainLink = gv.sheetLink || '#';
+                let recordLink = RECORD_SHEET_URL;
+                if (gv.recordRow) {
+                    let fileIdMatch = RECORD_SHEET_URL.match(/\/d\/([a-zA-Z0-9-_]+)/);
+                    let gidMatch = RECORD_SHEET_URL.match(/gid=([0-9]+)/);
+                    if (fileIdMatch && gidMatch) {
+                        recordLink = `https://docs.google.com/spreadsheets/d/${fileIdMatch[1]}/edit#gid=${gidMatch[1]}&range=C${gv.recordRow}`;
+                    } else {
+                        recordLink = RECORD_SHEET_URL.split('?')[0].split('#')[0] + '#range=C' + gv.recordRow;
+                    }
+                }
+
                 Object.keys(mainClassCounts).forEach(className => {
                     displayIndex++;
                     let mainCount = mainClassCounts[className];
@@ -1342,8 +1355,12 @@
                         <td class="py-4 px-6 lg:px-8 text-center text-gray-400 font-bold">${displayIndex}</td>
                         <td class="py-4 px-4 lg:px-6 font-bold text-beu-darkPurple">${gv.name || gv.file.replace(/^[0-9]+\.\s*/, '')}</td>
                         <td class="py-4 px-4 lg:px-6 font-bold text-beu-purple text-sm">${className}</td>
-                        <td class="py-4 px-4 lg:px-6 text-center font-black text-gray-700 text-lg">${mainCount}</td>
-                        <td class="py-4 px-4 lg:px-6 text-center font-black text-beu-teal text-lg bg-beu-lightTeal/5 border-l border-r border-gray-50">${recordCount || '<span class="text-xs text-gray-300 font-medium">0</span>'}</td>
+                        <td class="py-4 px-4 lg:px-6 text-center font-black text-gray-700 text-lg">
+                            <a href="${mainLink}" target="_blank" class="hover:text-beu-teal hover:underline decoration-2 underline-offset-4 transition-all" title="Mở File Gốc của Giáo Viên">${mainCount}</a>
+                        </td>
+                        <td class="py-4 px-4 lg:px-6 text-center font-black text-beu-teal text-lg bg-beu-lightTeal/5 border-l border-r border-gray-50">
+                            <a href="${recordLink}" target="_blank" class="hover:text-beu-darkTeal hover:underline decoration-2 underline-offset-4 transition-all" title="Mở File Record để kiểm tra">${recordCount || '<span class="text-xs text-gray-300 font-medium">0</span>'}</a>
+                        </td>
                         <td class="py-4 px-6 lg:px-8 text-center">${statusHtml}</td>
                     `;
                     tbody.appendChild(tr);
@@ -1662,11 +1679,13 @@
 
             // 1. Lấy danh sách ngày TỪ FILE GỐC
             let mainDates = [];
-            gv.details.forEach(row => {
-                if(normalizeName(row.class) === normClassName && row.date) {
-                    mainDates.push(formatStandardDate(row.date));
-                }
-            });
+            if(gv.details && gv.details.length > 0) {
+                gv.details.forEach(row => {
+                    if(normalizeName(row.class) === normClassName && row.date) {
+                        mainDates.push(formatStandardDate(row.date));
+                    }
+                });
+            }
 
             // 2. Lấy danh sách ngày TỪ FILE RECORD
             let recordDates = [];
@@ -1759,7 +1778,7 @@
             const tbody = document.getElementById('modalTableBody');
             tbody.innerHTML = '';
 
-            if (gv.details.length === 0) {
+            if (!gv.details || gv.details.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="py-12 text-center text-gray-500 font-medium">Chưa có dữ liệu nào được Giáo Viên nhập trong tab này (Bắt đầu đếm từ dòng số 4).</td></tr>`;
             } else {
                 gv.details.forEach((row, rIdx) => {
