@@ -2043,6 +2043,37 @@
         function closeModal() {
             document.getElementById('detailModal').classList.remove('active');
         }
+        // ==========================================
+        // KHU VỰC TỰ ĐỘNG LÀM MỚI (6 GIỜ / LẦN BẮT ĐẦU TỪ 00:00)
+        // ==========================================
+        function scheduleNextAutoSync() {
+            const now = new Date();
+            // Tính toán mốc 6 giờ tiếp theo (00:00, 06:00, 12:00, 18:00)
+            let nextHour = (Math.floor(now.getHours() / 6) + 1) * 6;
+            
+            const nextSyncDate = new Date(now);
+            if (nextHour >= 24) {
+                nextSyncDate.setDate(nextSyncDate.getDate() + 1); // Chuyển sang ngày hôm sau
+                nextHour = 0;
+            }
+            nextSyncDate.setHours(nextHour, 0, 0, 0); // Set đúng giờ, 0 phút, 0 giây
+            
+            // Tính thời gian chờ (độ trễ) tính bằng mili-giây
+            const delay = nextSyncDate.getTime() - now.getTime();
+            
+            setTimeout(() => {
+                // Kiểm tra xem Admin đang đăng nhập thì mới chạy ngầm
+                if (sessionStorage.getItem('beu_dashboard_auth') === 'true') {
+                    console.log("Hệ thống tự động đồng bộ lúc: " + new Date().toLocaleTimeString());
+                    startSync(true); // Gọi hàm làm mới, true = bỏ qua bản lưu cache
+                }
+                // Chạy xong thì tiếp tục đặt lịch cho 6 tiếng tiếp theo
+                scheduleNextAutoSync(); 
+            }, delay);
+        }
+
+        // Kích hoạt bộ đếm giờ ngầm ngay khi tải xong trang web
+        scheduleNextAutoSync();
     </script>
 </body>
 </html>
