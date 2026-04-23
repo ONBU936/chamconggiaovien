@@ -317,7 +317,7 @@
                         <span class="text-xs text-gray-400 font-bold uppercase tracking-wider">Cập nhật lúc</span>
                         <span id="lastUpdateTime" class="text-sm font-bold text-beu-darkTeal">Chưa đồng bộ</span>
                     </div>
-                    <button onclick="startSync()" class="btn-sync bg-gradient-to-r from-beu-teal to-beu-darkTeal hover:from-beu-darkTeal hover:to-teal-700 text-white px-4 lg:px-6 py-3 rounded-xl font-bold shadow-lg shadow-beu-teal/30 transition-all transform hover:-translate-y-0.5 flex items-center gap-2 lg:gap-3">
+                    <button onclick="startSync(true)" class="btn-sync bg-gradient-to-r from-beu-teal to-beu-darkTeal hover:from-beu-darkTeal hover:to-teal-700 text-white px-4 lg:px-6 py-3 rounded-xl font-bold shadow-lg shadow-beu-teal/30 transition-all transform hover:-translate-y-0.5 flex items-center gap-2 lg:gap-3">
                         <i class="fas fa-sync-alt"></i> <span class="hidden sm:inline">Đồng Bộ</span>
                     </button>
                 </div>
@@ -770,13 +770,13 @@
             <div class="p-6 lg:p-8 overflow-y-auto flex-1 bg-gray-50 flex flex-col md:flex-row gap-6">
                 <!-- Cột 1: Thiếu -->
                 <div class="flex-1 bg-white rounded-2xl p-5 border border-red-100 shadow-sm flex flex-col h-full">
-                    <h4 class="text-red-600 font-bold mb-1 flex items-center gap-2 text-lg"><i class="fas fa-minus-circle"></i> FILE CHẤM CÔNG GIÁO VIÊN</h4>
+                    <h4 class="text-red-600 font-bold mb-1 flex items-center gap-2 text-lg"><i class="fas fa-minus-circle"></i> Bị đếm THIẾU trong Record</h4>
                     <p class="text-xs text-gray-500 mb-4 font-medium">(File gốc có báo cáo dạy nhưng Record bị sót)</p>
                     <ul id="diffMissingList" class="space-y-2 flex-1 overflow-y-auto pr-2"></ul>
                 </div>
                 <!-- Cột 2: Dư -->
                 <div class="flex-1 bg-white rounded-2xl p-5 border border-yellow-200 shadow-sm flex flex-col h-full">
-                    <h4 class="text-yellow-600 font-bold mb-1 flex items-center gap-2 text-lg"><i class="fas fa-plus-circle"></i> FILE CHẤM RECORD</h4>
+                    <h4 class="text-yellow-600 font-bold mb-1 flex items-center gap-2 text-lg"><i class="fas fa-plus-circle"></i> Bị đếm DƯ trong Record</h4>
                     <p class="text-xs text-gray-500 mb-4 font-medium">(Không có trong File Gốc nhưng Record lại đếm)</p>
                     <ul id="diffExtraList" class="space-y-2 flex-1 overflow-y-auto pr-2"></ul>
                 </div>
@@ -1081,7 +1081,7 @@
             return String(dateStr);
         }
 
-        async function startSync() {
+        async function startSync(isForceRefresh = false) {
             const errorBanner = document.getElementById('errorBanner');
             errorBanner.classList.add('hidden');
 
@@ -1101,6 +1101,11 @@
             const progressBar = document.getElementById('syncProgressBar');
             
             const cacheKey = 'beu_data_' + formattedMonth;
+            
+            if (isForceRefresh) {
+                localStorage.removeItem(cacheKey);
+            }
+            
             const cachedRawData = localStorage.getItem(cacheKey);
             
             if (cachedRawData) {
@@ -1230,11 +1235,11 @@
                         overlay.style.display = 'none';
                         renderData(); 
                         renderCharts(formattedMonth, globalTrendData); 
-                        renderAllowanceData(); // Vẽ bảng Phụ Cấp
-                        renderComparisonData(); // Vẽ bảng Đối Chiếu Lớp
+                        renderAllowanceData(); 
+                        renderComparisonData(); 
                         const now = new Date();
                         document.getElementById('lastUpdateTime').innerText = now.getHours() + ":" + String(now.getMinutes()).padStart(2, '0') + " hôm nay";
-                    }, 600);
+                    }, 100);
                 } else {
                     overlay.style.display = 'none';
                     showError("Kết nối API chính báo lỗi: " + (jsonResponse.message || "Không xác định"));
@@ -1287,6 +1292,7 @@
         function renderComparisonData() {
             const tbody = document.getElementById('comparisonTableBody');
             tbody.innerHTML = '';
+            const fragment = document.createDocumentFragment();
             let displayIndex = 0;
 
             if (globalDriveData.length === 0 && globalRecordData.length === 0) {
@@ -1422,7 +1428,7 @@
                         </td>
                         <td class="py-4 px-6 lg:px-8 text-center">${statusHtml}</td>
                     `;
-                    tbody.appendChild(tr);
+                    fragment.appendChild(tr);
                 });
 
                 // 2. HIỂN THỊ CÁC LỚP CÓ TRONG RECORD NHƯNG KHÔNG CÓ TRONG FILE GỐC (DƯ RA BÊN RECORD)
@@ -1439,7 +1445,7 @@
                         let diff = 0 - recordCount; // Dư
                         let text = `Dư ${Math.abs(diff)} công`;
                         
-                        let statusHtml = `<button onclick="openDiffModal(${gvIndex}, '${safeClassName}')" class="bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase shadow-sm cursor-help transition-colors flex items-center gap-1.5 mx-auto" title="Lớp này có trong Record nhưng không có trong File Gốc!"><i class="fas fa-exclamation-circle mr-1"></i> GV chưa chấm công</button>`;
+                        let statusHtml = `<button onclick="openDiffModal(${gvIndex}, '${safeClassName}')" class="bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase shadow-sm cursor-help transition-colors flex items-center gap-1.5 mx-auto" title="Lớp này có trong Record nhưng không có trong File Gốc!"><i class="fas fa-exclamation-circle mr-1"></i> Gốc Bỏ Trống</button>`;
 
                         const tr = document.createElement('tr');
                         tr.className = `hover:bg-gray-50/80 transition-colors animate-slide-up border-b border-gray-100 bg-red-50/20`;
@@ -1457,7 +1463,7 @@
                             </td>
                             <td class="py-4 px-6 lg:px-8 text-center">${statusHtml}</td>
                         `;
-                        tbody.appendChild(tr);
+                        fragment.appendChild(tr);
                     }
                 });
 
@@ -1502,7 +1508,7 @@
                                 </td>
                                 <td class="py-4 px-6 lg:px-8 text-center">${statusHtml}</td>
                             `;
-                            tbody.appendChild(tr);
+                            fragment.appendChild(tr);
                         });
                     }
                 });
@@ -1510,6 +1516,8 @@
             
             if(displayIndex === 0) {
                  tbody.innerHTML = `<tr><td colspan="6" class="py-16 text-center text-gray-500 font-medium">Chưa có dữ liệu lớp học để đối chiếu.</td></tr>`;
+            } else {
+                 tbody.appendChild(fragment);
             }
         }
 
@@ -1519,6 +1527,7 @@
         function renderAllowanceData() {
             const tbody = document.getElementById('allowanceTableBody');
             tbody.innerHTML = '';
+            const fragment = document.createDocumentFragment();
             
             let totalAllowanceAmount = 0;
             let displayIndex = 0;
@@ -1569,11 +1578,13 @@
                         </button>
                     </td>
                 `;
-                tbody.appendChild(tr);
+                fragment.appendChild(tr);
             });
 
             if (displayIndex === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="py-16 text-center text-gray-500 font-medium">Tháng này không có Giáo Viên Offline nào được chấm công.</td></tr>`;
+            } else {
+                tbody.appendChild(fragment);
             }
 
             document.getElementById('totalAllowanceAmount').innerText = formatter.format(totalAllowanceAmount);
@@ -1582,6 +1593,7 @@
         function renderData() {
             const tbody = document.getElementById('teachersTableBody');
             tbody.innerHTML = '';
+            const fragment = document.createDocumentFragment();
             
             let totalSessions = 0;
             let totalApproved = 0;
@@ -1666,8 +1678,14 @@
                         </button>
                     </td>
                 `;
-                tbody.appendChild(tr);
+                fragment.appendChild(tr);
             });
+
+            if (displayIndex === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="py-16 text-center text-gray-500 font-medium">Không tìm thấy file nào hoặc thư mục trống.</td></tr>`;
+            } else {
+                tbody.appendChild(fragment);
+            }
 
             document.getElementById('statFiles').innerHTML = `${displayIndex} <span class="text-sm lg:text-base font-medium text-gray-400 normal-case hidden sm:inline">file</span>`;
             document.getElementById('statSessions').innerHTML = `${totalSessions.toLocaleString()} <span class="text-sm lg:text-base font-medium text-gray-400 normal-case hidden sm:inline">buổi học</span>`;
@@ -1900,7 +1918,7 @@
             extraList.innerHTML = '';
 
             if (missingInRecord.length === 0) {
-                missingList.innerHTML = '<li class="text-gray-400 italic text-center py-4">Chưa có dữ liệu!</li>';
+                missingList.innerHTML = '<li class="text-gray-400 italic text-center py-4">Tuyệt vời, không bị đếm thiếu ngày nào!</li>';
             } else {
                 missingInRecord.forEach(item => {
                     let li = document.createElement('li');
@@ -1911,7 +1929,7 @@
             }
 
             if (extraInRecord.length === 0) {
-                extraList.innerHTML = '<li class="text-gray-400 italic text-center py-4">Không có dữ liệu!</li>';
+                extraList.innerHTML = '<li class="text-gray-400 italic text-center py-4">Tuyệt vời, không bị đếm dư ngày nào!</li>';
             } else {
                 extraInRecord.forEach(item => {
                     let li = document.createElement('li');
@@ -1938,6 +1956,7 @@
 
             const tbody = document.getElementById('modalTableBody');
             tbody.innerHTML = '';
+            const fragment = document.createDocumentFragment();
 
             if (!gv.details || gv.details.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="py-12 text-center text-gray-500 font-medium">Chưa có dữ liệu nào được Giáo Viên nhập trong tab này (Bắt đầu đếm từ dòng số 4).</td></tr>`;
@@ -1966,8 +1985,9 @@
                             ${statusHtml}
                         </td>
                     `;
-                    tbody.appendChild(tr);
+                    fragment.appendChild(tr);
                 });
+                tbody.appendChild(fragment);
             }
 
             document.getElementById('detailModal').classList.add('active');
@@ -1993,6 +2013,7 @@
 
             const tbody = document.getElementById('allowanceModalTableBody');
             tbody.innerHTML = '';
+            const fragment = document.createDocumentFragment();
             
             const formatter = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' });
 
@@ -2007,8 +2028,9 @@
                         <td class="py-4 px-6 border-r border-gray-100 font-bold text-beu-darkPurple text-lg"><i class="far fa-calendar-alt text-beu-teal mr-2"></i> ${dateStr}</td>
                         <td class="py-4 px-4 text-center bg-green-50/30 font-black text-green-600">${formatter.format(ALLOWANCE_RATE)}</td>
                     `;
-                    tbody.appendChild(tr);
+                    fragment.appendChild(tr);
                 });
+                tbody.appendChild(fragment);
             }
 
             document.getElementById('allowanceModal').classList.add('active');
