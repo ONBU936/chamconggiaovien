@@ -259,6 +259,11 @@
                     <i class="fas fa-route w-5 text-lg transition-transform group-hover:scale-110"></i>
                     <span class="font-semibold relative z-10">Phụ cấp đi lại</span>
                 </a>
+                <a href="#" onclick="switchTab('doi-chieu'); toggleSidebar();" id="nav-doi-chieu" class="sidebar-link flex items-center gap-4 text-white/70 hover:text-white hover:bg-white/10 px-5 py-3.5 rounded-xl transition-all duration-300 group relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-r from-beu-teal/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <i class="fas fa-balance-scale w-5 text-lg transition-transform group-hover:scale-110"></i>
+                    <span class="font-semibold relative z-10">Đối Chiếu Lớp</span>
+                </a>
             </nav>
             <div class="p-6 border-t border-white/10 bg-black/10 relative z-10">
                 <div class="flex items-center gap-4">
@@ -560,6 +565,65 @@
                         </div>
                     </div>
                 </div>
+
+                <div id="view-doi-chieu" class="hidden animate-slide-up w-full">
+                    <div class="bg-white rounded-3xl shadow-soft border border-gray-100 overflow-hidden relative w-full">
+                        <div class="h-2 w-full bg-gradient-to-r from-yellow-400 via-orange-400 to-red-500"></div>
+                        
+                        <div class="px-6 lg:px-8 py-6 border-b border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4 bg-white relative z-10">
+                            <div>
+                                <h3 class="text-xl font-bold text-beu-darkPurple flex items-center gap-3">
+                                    <i class="fas fa-balance-scale text-beu-lightTeal"></i> Đối Chiếu Số Lượng Công Từng Lớp
+                                </h3>
+                                <p class="text-sm text-gray-500 mt-1 ml-8">Hệ thống AI tự động bóc tách và đối chiếu chi tiết từng lớp giữa File Gốc và Record</p>
+                            </div>
+                        </div>
+                        
+                        <div class="overflow-x-auto relative z-0 pb-4 w-full">
+                            <table class="w-full text-left border-collapse min-w-[900px]" id="comparisonTable">
+                                <thead>
+                                    <tr class="bg-gray-50/80 text-gray-500 text-xs uppercase tracking-widest border-b border-gray-200">
+                                        <th class="py-5 px-6 lg:px-8 font-bold text-center rounded-tl-xl w-16 group relative">
+                                            <div contenteditable="true" class="editable-header outline-none border-b border-transparent focus:border-beu-teal transition-colors px-2 py-1 rounded hover:bg-black/5 inline-block cursor-text" data-key="header_comp_stt" data-default="STT" spellcheck="false" title="Bấm vào để đổi tên">STT</div>
+                                            <i class="fas fa-pen absolute right-2 top-1/2 -translate-y-1/2 text-[10px] opacity-0 group-hover:opacity-40 transition-opacity pointer-events-none"></i>
+                                        </th>
+                                        <th class="py-5 px-4 lg:px-6 font-bold group relative">
+                                            <div contenteditable="true" class="editable-header outline-none border-b border-transparent focus:border-beu-teal transition-colors px-2 py-1 rounded hover:bg-black/5 inline-block cursor-text" data-key="header_comp_teacher" data-default="GIÁO VIÊN" spellcheck="false" title="Bấm vào để đổi tên">GIÁO VIÊN</div>
+                                            <i class="fas fa-pen absolute right-2 top-1/2 -translate-y-1/2 text-[10px] opacity-0 group-hover:opacity-40 transition-opacity pointer-events-none"></i>
+                                        </th>
+                                        <th class="py-5 px-4 lg:px-6 font-bold group relative">
+                                            <div contenteditable="true" class="editable-header outline-none border-b border-transparent focus:border-beu-teal transition-colors px-2 py-1 rounded hover:bg-black/5 inline-block cursor-text" data-key="header_comp_class" data-default="TÊN LỚP HỌC" spellcheck="false" title="Bấm vào để đổi tên">TÊN LỚP HỌC</div>
+                                            <i class="fas fa-pen absolute right-2 top-1/2 -translate-y-1/2 text-[10px] opacity-0 group-hover:opacity-40 transition-opacity pointer-events-none"></i>
+                                        </th>
+                                        <th class="py-5 px-4 lg:px-6 font-bold text-center group relative">
+                                            <div contenteditable="true" class="editable-header outline-none border-b border-transparent focus:border-beu-teal transition-colors px-2 py-1 rounded hover:bg-black/5 inline-block cursor-text" data-key="header_comp_main" data-default="CÔNG FILE GỐC" spellcheck="false" title="Bấm vào để đổi tên">CÔNG FILE GỐC</div>
+                                            <i class="fas fa-pen absolute right-2 top-1/2 -translate-y-1/2 text-[10px] opacity-0 group-hover:opacity-40 transition-opacity pointer-events-none"></i>
+                                        </th>
+                                        <th class="py-5 px-4 lg:px-6 font-bold text-center text-beu-teal whitespace-nowrap group relative">
+                                            <div contenteditable="true" class="editable-header outline-none border-b border-transparent focus:border-beu-teal transition-colors px-2 py-1 rounded hover:bg-beu-teal/10 inline-block cursor-text" data-key="header_comp_record" data-default="CÔNG RECORD" spellcheck="false" title="Bấm vào để đổi tên">CÔNG RECORD</div>
+                                            <i class="fas fa-pen absolute right-0 top-1/2 -translate-y-1/2 text-[10px] opacity-0 group-hover:opacity-50 transition-opacity pointer-events-none"></i>
+                                        </th>
+                                        <th class="py-5 px-6 lg:px-8 font-bold text-center rounded-tr-xl group relative">
+                                            <div contenteditable="true" class="editable-header outline-none border-b border-transparent focus:border-beu-teal transition-colors px-2 py-1 rounded hover:bg-black/5 inline-block cursor-text" data-key="header_comp_status" data-default="TRẠNG THÁI LỆCH" spellcheck="false" title="Bấm vào để đổi tên">TRẠNG THÁI LỆCH</div>
+                                            <i class="fas fa-pen absolute right-2 top-1/2 -translate-y-1/2 text-[10px] opacity-0 group-hover:opacity-40 transition-opacity pointer-events-none"></i>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="comparisonTableBody" class="text-sm divide-y divide-gray-100">
+                                    <tr>
+                                        <td colspan="6" class="py-24 text-center">
+                                            <div class="inline-flex flex-col items-center justify-center bg-gray-50 rounded-full w-40 h-40 mb-4 border border-gray-100 shadow-inner">
+                                                <i class="fas fa-balance-scale text-5xl text-beu-lightTeal animate-bounce"></i>
+                                            </div>
+                                            <p class="text-gray-500 font-medium text-lg">Hệ thống đang chờ dữ liệu.</p>
+                                            <p class="text-gray-400 mt-1">Bấm <b class="text-beu-teal">"Đồng Bộ"</b> để tải báo cáo.</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
                 
                 <div class="text-center text-xs text-gray-400 pt-4 pb-10 font-medium tracking-wide">
                     <i class="fas fa-shield-alt mr-1"></i> BẢO MẬT & VẬN HÀNH BỞI ADMIN YÊN - HỌC VIỆN ÔN NGỌC BeU &copy; 2026
@@ -627,7 +691,7 @@
         </div>
     </div>
 
-    <!-- Modal cho bảng Phụ Cấp Đi Lại (Lọc ngày duy nhất) -->
+    <!-- Modal cho bảng Phụ Cấp Đi Lại -->
     <div id="allowanceModal" class="modal fixed inset-0 z-50 items-center justify-center p-4 md:p-10">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-full overflow-hidden flex flex-col transform transition-all border border-white/20">
             <div class="px-6 lg:px-8 py-5 bg-gradient-to-r from-beu-darkTeal to-beu-teal text-white flex justify-between items-center shrink-0 shadow-md relative overflow-hidden">
@@ -680,6 +744,44 @@
                     </table>
                 </div>
                 <p class="text-xs text-gray-400 mt-4 text-center"><i class="fas fa-info-circle mr-1"></i> Nếu Giáo Viên có 2 lớp trong cùng 1 ngày, hệ thống chỉ đếm là 1 lần đến Học Viện.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Đối Chiếu Chi Tiết Lệch Công -->
+    <div id="diffModal" class="modal fixed inset-0 z-50 items-center justify-center p-4 md:p-10">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-full overflow-hidden flex flex-col transform transition-all border border-white/20">
+            <div class="px-6 lg:px-8 py-5 bg-gradient-to-r from-orange-400 to-red-500 text-white flex justify-between items-center shrink-0 shadow-md relative overflow-hidden">
+                <div class="absolute right-0 top-0 opacity-10">
+                    <i class="fas fa-search-plus text-9xl -mt-6 -mr-4"></i>
+                </div>
+                <div class="relative z-10">
+                    <h3 class="text-xl font-bold tracking-wide">Chi Tiết Lệch Công: <span id="diffModalClassName" class="text-yellow-200"></span></h3>
+                    <p class="text-white/90 text-sm font-medium mt-1">Giáo viên: <span id="diffModalTeacherName" class="font-bold"></span></p>
+                </div>
+                <button onclick="closeDiffModal()" class="relative z-10 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 lg:p-8 overflow-y-auto flex-1 bg-gray-50 flex flex-col md:flex-row gap-6">
+                <!-- Cột 1: Thiếu -->
+                <div class="flex-1 bg-white rounded-2xl p-5 border border-red-100 shadow-sm flex flex-col h-full">
+                    <h4 class="text-red-600 font-bold mb-1 flex items-center gap-2 text-lg"><i class="fas fa-minus-circle"></i> Bị đếm THIẾU trong Record</h4>
+                    <p class="text-xs text-gray-500 mb-4 font-medium">(File Giáo Viên có báo cáo dạy nhưng File Record bị sót)</p>
+                    <ul id="diffMissingList" class="space-y-2 flex-1 overflow-y-auto pr-2"></ul>
+                </div>
+                <!-- Cột 2: Dư -->
+                <div class="flex-1 bg-white rounded-2xl p-5 border border-yellow-200 shadow-sm flex flex-col h-full">
+                    <h4 class="text-yellow-600 font-bold mb-1 flex items-center gap-2 text-lg"><i class="fas fa-plus-circle"></i> Bị đếm DƯ trong Record</h4>
+                    <p class="text-xs text-gray-500 mb-4 font-medium">(Không có trong File Giáo Viên nhưng file Record lại đếm)</p>
+                    <ul id="diffExtraList" class="space-y-2 flex-1 overflow-y-auto pr-2"></ul>
+                </div>
+            </div>
+            <div class="px-6 lg:px-8 py-5 border-t border-gray-100 flex justify-end gap-3 bg-gray-50 shrink-0">
+                <button onclick="closeDiffModal()" class="px-6 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-700 font-bold hover:bg-gray-100 hover:text-beu-darkPurple transition-colors shadow-sm">
+                    Đóng cửa sổ
+                </button>
             </div>
         </div>
     </div>
@@ -882,12 +984,13 @@
         const ALLOWANCE_RATE = 50000;
 
         let globalDriveData = [];
+        let globalRecordData = []; // LƯU TRỮ DATA RECORD ĐỂ SO SÁNH
         let globalTrendData = null; 
         let barChartTeacher = null;
         let pieChartStatus = null;
         let lineChartTrend = null;
 
-        // BỘ LỌC TÊN SIÊU ĐẲNG CỦA ADMIN YÊN
+        // BỘ LỌC TÊN SIÊU ĐẲNG - PHIÊN BẢN ỔN ĐỊNH NHẤT
         function removeAccents(str) {
             return str.normalize('NFD')
                       .replace(/[\u0300-\u036f]/g, '')
@@ -909,6 +1012,30 @@
             return cleanName.trim();
         }
 
+        // Hàm kiểm tra khớp tên cực kỳ cẩn thận và chính xác
+        function isTeacherMatch(mainName, fileName, recordName) {
+            let nMain = normalizeName(mainName);
+            let nFile = normalizeName(fileName);
+            let nRec = normalizeName(recordName);
+            
+            if (!nRec) return false;
+
+            // Kiểm tra khớp trực tiếp hoặc chứa nhau (Bọc lỗi dư chữ, gõ sai tên lót nhẹ)
+            if (nMain && (nMain === nRec || nMain.includes(nRec) || nRec.includes(nMain))) return true;
+            if (nFile && (nFile === nRec || nFile.includes(nRec) || nRec.includes(nFile))) return true;
+            
+            // Xử lý ca khó nhất: Mất hẳn tên lót (VD: nguyen thi thao nguyen và nguyen thao nguyen)
+            let arrMain = nMain.split(' ');
+            let arrRec = nRec.split(' ');
+            if (arrMain.length >= 2 && arrRec.length >= 2) {
+                 let firstMain = arrMain[0], lastMain = arrMain[arrMain.length-1];
+                 let firstRec = arrRec[0], lastRec = arrRec[arrRec.length-1];
+                 if (firstMain === firstRec && lastMain === lastRec) return true;
+            }
+            
+            return false;
+        }
+
         // BỘ CHUẨN HOÁ NGÀY THÁNG ĐƯA MỌI ĐỊNH DẠNG VỀ CHUẨN VIỆT NAM (DD/MM/YYYY)
         function formatStandardDate(dateStr) {
             if (!dateStr) return "";
@@ -928,12 +1055,10 @@
                 if (p3.length === 2) p3 = "20" + p3; // Xử lý nếu người dùng gõ năm 2 chữ số (VD: 26 -> 2026)
                 
                 // Tránh lỗi chuẩn Mỹ MM/DD/YYYY (Google Sheet tự đảo)
-                // Ví dụ: 04/11/2026 -> đổi lại thành 11/04/2026
                 if (p1 === selMonth && p2 !== selMonth) {
                     return `${p2}/${p1}/${p3}`;
                 }
                 
-                // Mặc định: DD/MM/YYYY
                 return `${p1}/${p2}/${p3}`;
             } else if (parts.length === 2) {
                 // Xử lý dạng gõ tắt DD/MM (VD: 14/4 -> 14/04/2026)
@@ -972,9 +1097,11 @@
                     const parsedCache = JSON.parse(cachedRawData);
                     globalDriveData = parsedCache.data;
                     globalTrendData = parsedCache.trend;
+                    globalRecordData = parsedCache.recordData || [];
                     renderData();
                     renderCharts(formattedMonth, globalTrendData);
                     renderAllowanceData(); // Vẽ bảng Phụ Cấp
+                    renderComparisonData(); // Vẽ bảng Đối Chiếu Lớp
                     
                     document.getElementById('lastUpdateTime').innerText = "Đang làm mới ngầm...";
                 } catch(e) {
@@ -998,6 +1125,17 @@
 
                 const fetchUrl = `${API_URL}?month=${formattedMonth}`;
                 
+                // Lấy API chính
+                let fetchMainPromise = fetch(fetchUrl)
+                    .then(res => {
+                        if (!res.ok) throw new Error("Lỗi HTTP: " + res.status);
+                        return res.text();
+                    })
+                    .catch(e => {
+                        console.error("Lỗi fetch API Chính:", e);
+                        throw new Error("MAIN_API_FAILED");
+                    });
+                
                 let fetchRecordPromise = Promise.resolve(null);
                 if (RECORD_API_URL && RECORD_API_URL.trim() !== '') {
                     fetchRecordPromise = fetch(`${RECORD_API_URL}?month=${formattedMonth}`)
@@ -1011,12 +1149,11 @@
                         });
                 }
 
-                const [response, recordTextRaw] = await Promise.all([
-                    fetch(fetchUrl),
+                const [textRaw, recordTextRaw] = await Promise.all([
+                    fetchMainPromise,
                     fetchRecordPromise
                 ]);
                 
-                const textRaw = await response.text();
                 clearInterval(progressInterval);
 
                 let jsonResponse;
@@ -1024,7 +1161,11 @@
                     jsonResponse = JSON.parse(textRaw);
                 } catch(e) {
                     overlay.style.display = 'none';
-                    showError("LỖI PHÂN QUYỀN API CHÍNH: Dashboard đang bị chặn.<br><b>Khắc phục:</b> Vào Apps Script > Quản lý bản triển khai > Chỉnh sửa (Bút chì) > Người truy cập: <b>Bất kỳ ai</b> > Phiên bản mới > Lưu.");
+                    if(textRaw.includes("<html") || textRaw.includes("Sign in")) {
+                        showError("<b>⚠️ LỖI PHÂN QUYỀN API CHÍNH:</b> Dashboard đang bị chặn vì Google yêu cầu đăng nhập ngầm.<br>👉 <b>Cách sửa:</b> Chị vào Apps Script của <b>File Chấm Công Gốc</b> > Quản lý bản triển khai > Chỉnh sửa (Cây bút) > Chọn <b>Phiên bản mới</b> > Người truy cập: <b>Bất kỳ ai (Anyone)</b> > Lưu.");
+                    } else {
+                        showError("<b>⚠️ LỖI KẾT NỐI API CHÍNH:</b> Dữ liệu trả về bị lỗi định dạng.");
+                    }
                     return;
                 }
 
@@ -1037,7 +1178,7 @@
 
                     if (recordTextRaw) {
                         if (recordTextRaw === "ERROR_CORS_NETWORK") {
-                            showError("<b>⚠️ CẢNH BÁO API RECORD:</b> Website bị chặn quyền truy cập vào file Google Sheet Record. <br>Hãy kiểm tra lại xem chị đã cài <b>'Người truy cập: Bất kỳ ai (Anyone)'</b> chưa nhé.");
+                            showError("<b>⚠️ CẢNH BÁO API RECORD:</b> Website bị chặn quyền truy cập vào file Google Sheet Record. <br>Hãy kiểm tra lại xem chị đã cài <b>'Người truy cập: Bất kỳ ai (Anyone)'</b> bên file Record chưa nhé.");
                         } else {
                             try {
                                 const recordJson = JSON.parse(recordTextRaw);
@@ -1046,21 +1187,12 @@
                                     showError("<b>⚠️ LỖI TỪ BÊN TRONG FILE SHEET RECORD:</b> " + recordJson.message);
                                 } else if(recordJson.status === "success" && recordJson.data) {
                                     
-                                    // SO SÁNH GHÉP TÊN
+                                    globalRecordData = recordJson.data;
+
+                                    // SO SÁNH GHÉP TÊN (SỬ DỤNG BỘ LỌC CỐT LÕI)
                                     globalDriveData.forEach(gv => {
                                         if(gv.id !== "ERR") {
-                                            const nameMain = normalizeName(gv.name);
-                                            const nameFile = normalizeName(gv.file);
-                                            
-                                            const match = recordJson.data.find(r => {
-                                                const nameRecord = normalizeName(r.name);
-                                                if (!nameRecord) return false;
-                                                
-                                                // Tìm kiếm chéo cực mạnh (Tránh trường hợp sai khác 1 chữ)
-                                                const isMatch = (nameMain && (nameMain === nameRecord || nameMain.includes(nameRecord) || nameRecord.includes(nameMain))) || 
-                                                                (nameFile && (nameFile === nameRecord || nameFile.includes(nameRecord) || nameRecord.includes(nameFile)));
-                                                return isMatch;
-                                            });
+                                            const match = recordJson.data.find(r => isTeacherMatch(gv.name, gv.file, r.name));
 
                                             if(match) {
                                                 gv.recordTotal = parseInt(match.recordTotal) || 0; 
@@ -1081,13 +1213,14 @@
                         }
                     }
                     
-                    localStorage.setItem(cacheKey, JSON.stringify({ data: globalDriveData, trend: globalTrendData }));
+                    localStorage.setItem(cacheKey, JSON.stringify({ data: globalDriveData, trend: globalTrendData, recordData: globalRecordData }));
                     
                     setTimeout(() => {
                         overlay.style.display = 'none';
                         renderData(); 
                         renderCharts(formattedMonth, globalTrendData); 
                         renderAllowanceData(); // Vẽ bảng Phụ Cấp
+                        renderComparisonData(); // Vẽ bảng Đối Chiếu Lớp
                         const now = new Date();
                         document.getElementById('lastUpdateTime').innerText = now.getHours() + ":" + String(now.getMinutes()).padStart(2, '0') + " hôm nay";
                     }, 600);
@@ -1098,8 +1231,12 @@
 
             } catch (error) {
                 overlay.style.display = 'none';
-                if (!cachedRawData) {
-                    showError("LỖI MẠNG: Không thể kết nối. Xin hãy kiểm tra lại kết nối Wifi hoặc VPN.");
+                if (error.message === "MAIN_API_FAILED") {
+                    showError("<b>⚠️ LỖI KẾT NỐI API CHÍNH (Lỗi Phân Quyền/CORS):</b> Trình duyệt chặn kết nối. 99% là do file Sheet TỔNG HỢP CÔNG (File API Chính) đang bị mất quyền.<br>👉 <b>Cách sửa:</b> Chị vào Apps Script của file chính > Quản lý bản triển khai > Chỉnh sửa (Cây bút) > Bắt buộc chọn <b>Phiên bản mới</b> > Người truy cập: <b>Bất kỳ ai (Anyone)</b> > Lưu.");
+                } else if (!cachedRawData) {
+                    showError("<b>⚠️ LỖI MẠNG:</b> Không thể kết nối. Xin hãy kiểm tra lại kết nối Wifi hoặc VPN.");
+                } else {
+                    showError("<b>⚠️ LỖI KẾT NỐI:</b> Mạng yếu hoặc quyền truy cập Google Sheet bị lỗi. Hệ thống đang hiển thị dữ liệu cũ đã lưu.");
                 }
             }
         }
@@ -1134,6 +1271,91 @@
         }
 
         // ==========================================
+        // KHU VỰC VẼ BẢNG ĐỐI CHIẾU THEO LỚP
+        // ==========================================
+        function renderComparisonData() {
+            const tbody = document.getElementById('comparisonTableBody');
+            tbody.innerHTML = '';
+            let displayIndex = 0;
+
+            if (globalDriveData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-16 text-center text-gray-500 font-medium">Không có dữ liệu để đối chiếu.</td></tr>`;
+                return;
+            }
+
+            globalDriveData.forEach((gv) => {
+                if (gv.id === "ERR" || !gv.details || (gv.file && gv.file.includes("Chưa có Tab"))) return;
+
+                let mainClassCounts = {};
+                gv.details.forEach(row => {
+                    let cName = row.class ? row.class.trim() : "Chưa có tên lớp";
+                    if(cName !== "") {
+                        mainClassCounts[cName] = (mainClassCounts[cName] || 0) + 1;
+                    }
+                });
+
+                let recordClasses = [];
+                if (globalRecordData && globalRecordData.length > 0) {
+                    let match = globalRecordData.find(r => isTeacherMatch(gv.name, gv.file, r.name));
+                    if (match && match.classes) {
+                        recordClasses = match.classes; 
+                    }
+                }
+
+                Object.keys(mainClassCounts).forEach(className => {
+                    displayIndex++;
+                    let mainCount = mainClassCounts[className];
+                    let normClassName = normalizeName(className);
+                    
+                    let recordCount = 0;
+                    let foundRecordClass = recordClasses.find(rc => {
+                        let nRC = normalizeName(rc.className);
+                        return nRC.includes(normClassName) || normClassName.includes(nRC) || nRC === normClassName;
+                    });
+                    
+                    if (foundRecordClass) {
+                        recordCount = foundRecordClass.count;
+                    }
+
+                    let statusHtml = "";
+                    if (recordClasses.length === 0) {
+                        statusHtml = `<span class="bg-gray-100 text-gray-500 px-3 py-1 rounded-lg text-[11px] font-bold uppercase shadow-sm cursor-help" title="Không tìm thấy chi tiết lớp nào. Hãy kiểm tra Cột C và Cột E trong file Record!">Chờ Data Record</span>`;
+                    } else if (!foundRecordClass) {
+                        statusHtml = `<span class="bg-yellow-50 border border-yellow-200 text-yellow-600 px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase shadow-sm cursor-help" title="Tìm thấy Giáo Viên nhưng không thấy Tên Lớp này trong File Record. Chị kiểm tra xem tên lớp có bị gõ sai không nhé!"><i class="fas fa-search-minus mr-1"></i> Lệch Tên Lớp</span>`;
+                    } else if (mainCount === recordCount) {
+                        statusHtml = `<span class="bg-green-100 border border-green-200 text-green-700 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm"><i class="fas fa-check-circle mr-1"></i> Khớp 100%</span>`;
+                    } else {
+                        let diff = mainCount - recordCount;
+                        let text = diff > 0 ? `Thiếu ${diff} công` : `Dư ${Math.abs(diff)} công`;
+                        let gvIndex = globalDriveData.indexOf(gv);
+                        let safeClassName = className.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                        
+                        // NÚT XEM CHI TIẾT NGÀY BỊ LỆCH
+                        statusHtml = `<button onclick="openDiffModal(${gvIndex}, '${safeClassName}')" class="bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition-colors flex items-center gap-1.5 mx-auto" title="Bấm để xem chi tiết ngày lệch"><i class="fas fa-search-plus"></i> Xem Lệch (${text})</button>`;
+                    }
+
+                    const tr = document.createElement('tr');
+                    tr.className = `hover:bg-gray-50/80 transition-colors animate-slide-up border-b border-gray-100`;
+                    tr.style.animationDelay = `${(displayIndex % 20) * 0.05}s`;
+
+                    tr.innerHTML = `
+                        <td class="py-4 px-6 lg:px-8 text-center text-gray-400 font-bold">${displayIndex}</td>
+                        <td class="py-4 px-4 lg:px-6 font-bold text-beu-darkPurple">${gv.name || gv.file.replace(/^[0-9]+\.\s*/, '')}</td>
+                        <td class="py-4 px-4 lg:px-6 font-bold text-beu-purple text-sm">${className}</td>
+                        <td class="py-4 px-4 lg:px-6 text-center font-black text-gray-700 text-lg">${mainCount}</td>
+                        <td class="py-4 px-4 lg:px-6 text-center font-black text-beu-teal text-lg bg-beu-lightTeal/5 border-l border-r border-gray-50">${recordCount || '<span class="text-xs text-gray-300 font-medium">0</span>'}</td>
+                        <td class="py-4 px-6 lg:px-8 text-center">${statusHtml}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+            
+            if(displayIndex === 0) {
+                 tbody.innerHTML = `<tr><td colspan="6" class="py-16 text-center text-gray-500 font-medium">Chưa có dữ liệu lớp học để đối chiếu.</td></tr>`;
+            }
+        }
+
+        // ==========================================
         // KHU VỰC VẼ BẢNG PHỤ CẤP ĐI LẠI
         // ==========================================
         function renderAllowanceData() {
@@ -1148,31 +1370,22 @@
                 return;
             }
 
-            // Tiền tệ Format VNĐ
             const formatter = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' });
 
             globalDriveData.forEach((gv, index) => {
                 if (gv.id === "ERR" || !gv.details) return;
 
-                // Lọc xem tên Giáo viên này có thuộc danh sách Offline không
-                const normName = normalizeName(gv.name);
-                const normFile = normalizeName(gv.file);
-                
-                const isOfflineTeacher = OFFLINE_TEACHERS.some(offlineName => 
-                    (normName && normName.includes(offlineName)) || 
-                    (normFile && normFile.includes(offlineName))
-                );
+                const isOfflineTeacher = OFFLINE_TEACHERS.some(offlineName => isTeacherMatch(gv.name, gv.file, offlineName));
 
-                if (!isOfflineTeacher) return; // Nếu không phải GV Offline thì bỏ qua
+                if (!isOfflineTeacher) return; 
 
                 displayIndex++;
 
-                // Thuật toán gom nhóm ngày (Loại bỏ các ngày trùng lặp)
                 let uniqueDatesSet = new Set();
                 gv.details.forEach(row => {
                     let d = row.date ? row.date.trim() : "";
                     if(d !== "") {
-                        uniqueDatesSet.add(formatStandardDate(d)); // Áp dụng bộ chuẩn hoá ngày tháng
+                        uniqueDatesSet.add(formatStandardDate(d));
                     }
                 });
 
@@ -1245,7 +1458,6 @@
                 if (gv.recordTotal !== undefined) {
                     let targetUrl = RECORD_SHEET_URL;
                     if (gv.recordRow) {
-                        // Tái tạo link cực kỳ sạch sẽ và chính xác cho Google Sheet
                         let fileIdMatch = RECORD_SHEET_URL.match(/\/d\/([a-zA-Z0-9-_]+)/);
                         let gidMatch = RECORD_SHEET_URL.match(/gid=([0-9]+)/);
                         
@@ -1257,7 +1469,6 @@
                     }
 
                     if (gv.recordTotal === -1) {
-                        // HIỆN RÕ HỆ THỐNG ĐANG TÌM TÊN GÌ NẾU LỖI
                         let tenTimKiem = normalizeName(gv.name);
                         recordHtml = `<span class="text-yellow-600 font-bold text-[10px] bg-yellow-50 border border-yellow-200 px-3 py-1.5 rounded-lg shadow-sm uppercase whitespace-nowrap cursor-help" title="Web đang tìm '${tenTimKiem}' nhưng không thấy bên File Record. Chị xem có bị lệch gì không nhé!">Lệch Tên</span>`;
                     } else if (gv.recordTotal === gv.total) {
@@ -1439,6 +1650,102 @@
                     }
                 }
             });
+        }
+
+        // Mở bảng kê chi tiết xem ngày nào lệch
+        function openDiffModal(gvIndex, className) {
+            const gv = globalDriveData[gvIndex];
+            let normClassName = normalizeName(className);
+            
+            document.getElementById('diffModalTeacherName').innerText = gv.name || gv.file.replace(/^[0-9]+\.\s*/, '');
+            document.getElementById('diffModalClassName').innerText = className;
+
+            // 1. Lấy danh sách ngày TỪ FILE GỐC
+            let mainDates = [];
+            gv.details.forEach(row => {
+                if(normalizeName(row.class) === normClassName && row.date) {
+                    mainDates.push(formatStandardDate(row.date));
+                }
+            });
+
+            // 2. Lấy danh sách ngày TỪ FILE RECORD
+            let recordDates = [];
+            if (globalRecordData && globalRecordData.length > 0) {
+                let match = globalRecordData.find(r => isTeacherMatch(gv.name, gv.file, r.name));
+                if (match && match.classes) {
+                    let foundRecordClass = match.classes.find(rc => {
+                        let nRC = normalizeName(rc.className);
+                        return nRC.includes(normClassName) || normClassName.includes(nRC) || nRC === normClassName;
+                    });
+                    if (foundRecordClass && foundRecordClass.recordDates) {
+                        const val = document.getElementById('monthSelector').value; // "YYYY-MM"
+                        const partsVal = val.split('-');
+                        const selMonth = partsVal[1];
+                        const selYear = partsVal[0];
+
+                        recordDates = foundRecordClass.recordDates.map(d => {
+                            let day = String(d).replace(/[^0-9]/g, '').padStart(2, '0');
+                            return `${day}/${selMonth}/${selYear}`;
+                        });
+                    }
+                }
+            }
+
+            // 3. ĐẾM VÀ SO SÁNH CHI TIẾT TỪNG NGÀY (Xử lý cả vụ 1 ngày dạy 2 buổi)
+            let mainDateCounts = {};
+            mainDates.forEach(d => mainDateCounts[d] = (mainDateCounts[d] || 0) + 1);
+
+            let recordDateCounts = {};
+            recordDates.forEach(d => recordDateCounts[d] = (recordDateCounts[d] || 0) + 1);
+
+            let missingInRecord = []; // Có trong gốc nhưng Record không đếm / đếm thiếu
+            let extraInRecord = [];   // Record tự dưng đếm mà File gốc không có
+
+            let allDates = Array.from(new Set([...mainDates, ...recordDates])).sort();
+
+            allDates.forEach(d => {
+                let mC = mainDateCounts[d] || 0;
+                let rC = recordDateCounts[d] || 0;
+                if (mC > rC) {
+                    missingInRecord.push({ date: d, diff: mC - rC });
+                } else if (rC > mC) {
+                    extraInRecord.push({ date: d, diff: rC - mC });
+                }
+            });
+
+            // 4. In ra giao diện
+            const missingList = document.getElementById('diffMissingList');
+            const extraList = document.getElementById('diffExtraList');
+            missingList.innerHTML = '';
+            extraList.innerHTML = '';
+
+            if (missingInRecord.length === 0) {
+                missingList.innerHTML = '<li class="text-gray-400 italic text-center py-4">Tuyệt vời, không bị đếm thiếu ngày nào!</li>';
+            } else {
+                missingInRecord.forEach(item => {
+                    let li = document.createElement('li');
+                    li.className = "flex justify-between items-center bg-red-50 px-3 py-2.5 rounded-xl border border-red-100 shadow-sm";
+                    li.innerHTML = `<span class="font-bold text-red-700 text-sm"><i class="far fa-calendar-alt opacity-70 mr-1.5"></i> ${item.date}</span> <span class="text-[10px] text-red-600 bg-red-100/80 border border-red-200 px-2 py-1 rounded-md font-bold uppercase tracking-wide">Thiếu ${item.diff} buổi</span>`;
+                    missingList.appendChild(li);
+                });
+            }
+
+            if (extraInRecord.length === 0) {
+                extraList.innerHTML = '<li class="text-gray-400 italic text-center py-4">Tuyệt vời, không bị đếm dư ngày nào!</li>';
+            } else {
+                extraInRecord.forEach(item => {
+                    let li = document.createElement('li');
+                    li.className = "flex justify-between items-center bg-yellow-50 px-3 py-2.5 rounded-xl border border-yellow-200 shadow-sm";
+                    li.innerHTML = `<span class="font-bold text-yellow-700 text-sm"><i class="far fa-calendar-alt opacity-70 mr-1.5"></i> ${item.date}</span> <span class="text-[10px] text-yellow-600 bg-yellow-100/80 border border-yellow-200 px-2 py-1 rounded-md font-bold uppercase tracking-wide">Dư ${item.diff} buổi</span>`;
+                    extraList.appendChild(li);
+                });
+            }
+
+            document.getElementById('diffModal').classList.add('active');
+        }
+
+        function closeDiffModal() {
+            document.getElementById('diffModal').classList.remove('active');
         }
 
         function openDetailModal(index) {
