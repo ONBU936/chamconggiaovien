@@ -1445,7 +1445,7 @@
                         let diff = 0 - recordCount; // Dư
                         let text = `Dư ${Math.abs(diff)} công`;
                         
-                        let statusHtml = `<button onclick="openDiffModal(${gvIndex}, '${safeClassName}')" class="bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase shadow-sm cursor-help transition-colors flex items-center gap-1.5 mx-auto" title="Lớp này có trong Record nhưng không có trong File Gốc!"><i class="fas fa-exclamation-circle mr-1"></i> Gốc Bỏ Trống</button>`;
+                        let statusHtml = `<button onclick="openDiffModal(${gvIndex}, '${safeClassName}')" class="bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase shadow-sm cursor-help transition-colors flex items-center gap-1.5 mx-auto" title="Lớp này có trong Record nhưng không có trong File Gốc!"><i class="fas fa-exclamation-circle mr-1"></i> GV CHƯA CHẤM CÔNG</button>`;
 
                         const tr = document.createElement('tr');
                         tr.className = `hover:bg-gray-50/80 transition-colors animate-slide-up border-b border-gray-100 bg-red-50/20`;
@@ -1456,7 +1456,7 @@
                             <td class="py-4 px-4 lg:px-6 font-bold text-beu-darkPurple">${gv.name || gv.file.replace(/^[0-9]+\.\s*/, '')}</td>
                             <td class="py-4 px-4 lg:px-6 font-bold text-beu-purple text-sm">${className}</td>
                             <td class="py-4 px-4 lg:px-6 text-center font-black text-gray-700 text-lg">
-                                <a href="${mainLink}" target="_blank" class="hover:text-beu-teal hover:underline decoration-2 underline-offset-4 transition-all" title="Mở File Gốc của Giáo Viên">0</a>
+                                <a href="${mainLink}" target="_blank" class="hover:text-beu-teal hover:underline decoration-2 underline-offset-4 transition-all" title="Mở File FILE của Giáo Viên">0</a>
                             </td>
                             <td class="py-4 px-4 lg:px-6 text-center font-black text-beu-teal text-lg bg-beu-lightTeal/5 border-l border-r border-gray-50">
                                 <a href="${recordLink}" target="_blank" class="hover:text-beu-darkTeal hover:underline decoration-2 underline-offset-4 transition-all" title="Mở File Record để kiểm tra">${recordCount}</a>
