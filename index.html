@@ -208,7 +208,7 @@
                     <p id="loginError" class="text-red-500 text-sm font-bold text-center bg-red-50 py-3 rounded-xl hidden animate-slide-up border border-red-100">
                         <i class="fas fa-exclamation-circle mr-1"></i> Mật khẩu không chính xác!
                     </p>
-                    <button onclick="checkPassword()" class="w-full bg-gradient-to-r from-beu-darkPurple to-[#46307a] hover:to-beu-darkPurple text-white font-bold py-4 rounded-2xl shadow-lg shadow-beu-darkPurple/20 transition-all transform hover:-translate-y-0.5 mt-2 text-sm tracking-widest uppercase flex items-center justify-center gap-2 group">
+                    <button id="loginBtn" onclick="checkPassword()" class="w-full bg-gradient-to-r from-beu-darkPurple to-[#46307a] hover:to-beu-darkPurple text-white font-bold py-4 rounded-2xl shadow-lg shadow-beu-darkPurple/20 transition-all transform hover:-translate-y-0.5 mt-2 text-sm tracking-widest uppercase flex items-center justify-center gap-2 group disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none">
                         <span>ĐĂNG NHẬP</span> <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
                     </button>
                 </div>
@@ -317,7 +317,7 @@
                         <span class="text-xs text-gray-400 font-bold uppercase tracking-wider">Cập nhật lúc</span>
                         <span id="lastUpdateTime" class="text-sm font-bold text-beu-darkTeal">Chưa đồng bộ</span>
                     </div>
-                    <button onclick="startSync(true)" class="btn-sync bg-gradient-to-r from-beu-teal to-beu-darkTeal hover:from-beu-darkTeal hover:to-teal-700 text-white px-4 lg:px-6 py-3 rounded-xl font-bold shadow-lg shadow-beu-teal/30 transition-all transform hover:-translate-y-0.5 flex items-center gap-2 lg:gap-3">
+                    <button id="btnSyncMain" onclick="startSync(true)" class="btn-sync bg-gradient-to-r from-beu-teal to-beu-darkTeal hover:from-beu-darkTeal hover:to-teal-700 text-white px-4 lg:px-6 py-3 rounded-xl font-bold shadow-lg shadow-beu-teal/30 transition-all transform hover:-translate-y-0.5 flex items-center gap-2 lg:gap-3">
                         <i class="fas fa-sync-alt"></i> <span class="hidden sm:inline">Đồng Bộ</span>
                     </button>
                 </div>
@@ -764,20 +764,19 @@
                 </button>
             </div>
             
-            <!-- THÊM CONTAINER CẢNH BÁO LỖI -->
             <div id="diffWarningBannerContainer" class="px-6 lg:px-8 pt-6 pb-0 bg-gray-50 empty:hidden"></div>
             
             <div class="p-6 lg:p-8 overflow-y-auto flex-1 bg-gray-50 flex flex-col md:flex-row gap-6">
                 <!-- Cột 1: Thiếu -->
                 <div class="flex-1 bg-white rounded-2xl p-5 border border-red-100 shadow-sm flex flex-col h-full">
-                    <h4 class="text-red-600 font-bold mb-1 flex items-center gap-2 text-lg"><i class="fas fa-minus-circle"></i> FILE CHẤM CÔNG GIÁO VIÊN</h4>
-                    <p class="text-xs text-gray-500 mb-4 font-medium">(File Giáo Viên có báodạy nhưng file Record bị sót)</p>
+                    <h4 class="text-red-600 font-bold mb-1 flex items-center gap-2 text-lg"><i class="fas fa-minus-circle"></i> Bị đếm THIẾU trong Record</h4>
+                    <p class="text-xs text-gray-500 mb-4 font-medium">(File gốc có báo cáo dạy nhưng Record bị sót)</p>
                     <ul id="diffMissingList" class="space-y-2 flex-1 overflow-y-auto pr-2"></ul>
                 </div>
                 <!-- Cột 2: Dư -->
                 <div class="flex-1 bg-white rounded-2xl p-5 border border-yellow-200 shadow-sm flex flex-col h-full">
-                    <h4 class="text-yellow-600 font-bold mb-1 flex items-center gap-2 text-lg"><i class="fas fa-plus-circle"></i> FILE CHẤM RECORD</h4>
-                    <p class="text-xs text-gray-500 mb-4 font-medium">(Không có trong File Giáo Viên nhưng File Record lại đếm)</p>
+                    <h4 class="text-yellow-600 font-bold mb-1 flex items-center gap-2 text-lg"><i class="fas fa-plus-circle"></i> Bị đếm DƯ trong Record</h4>
+                    <p class="text-xs text-gray-500 mb-4 font-medium">(Không có trong File Gốc nhưng Record lại đếm)</p>
                     <ul id="diffExtraList" class="space-y-2 flex-1 overflow-y-auto pr-2"></ul>
                 </div>
             </div>
@@ -790,8 +789,6 @@
     </div>
 
     <script>
-        const CORRECT_PASSWORD = "onngocbeu123";
-
         function updateUserInfo(email) {
             if(!email) return;
             document.getElementById('sidebarUserName').innerText = email;
@@ -807,7 +804,6 @@
             document.getElementById('monthSelector').value = `${yyyy}-${mm}`;
             document.getElementById('dynamicMonthTitle').innerText = `Tổng Hợp Công - Tháng ${mm}.${yyyy}`;
 
-            // Load tất cả tiêu đề cột đã lưu
             document.querySelectorAll('.editable-header').forEach(el => {
                 const key = el.getAttribute('data-key');
                 const defaultText = el.getAttribute('data-default');
@@ -819,7 +815,6 @@
                     el.innerText = defaultText;
                 }
 
-                // Chặn nút Enter tạo dòng mới, bấm Enter là lưu
                 el.addEventListener('keydown', function(e) {
                     if (e.key === 'Enter') {
                         e.preventDefault();
@@ -827,11 +822,10 @@
                     }
                 });
 
-                // Tự động lưu khi click ra ngoài
                 el.addEventListener('blur', function() {
                     let newTitle = this.innerText.trim();
                     if(newTitle === '') {
-                        newTitle = this.getAttribute('data-default'); // Trả về mặc định nếu lỡ tay xóa trắng
+                        newTitle = this.getAttribute('data-default'); 
                         this.innerText = newTitle;
                     }
                     localStorage.setItem('beu_' + key, newTitle);
@@ -854,7 +848,7 @@
             }
         });
 
-        function checkPassword() {
+        async function checkPassword() {
             const emailInput = document.getElementById('emailInput');
             const pwdInput = document.getElementById('passwordInput');
             const errorMsg = document.getElementById('loginError');
@@ -879,32 +873,58 @@
                 return;
             }
 
-            if (pwdInput.value === CORRECT_PASSWORD) {
-                sessionStorage.setItem('beu_dashboard_auth', 'true');
-                sessionStorage.setItem('beu_user_email', emailVal);
-                updateUserInfo(emailVal);
+            const loginBtn = document.getElementById('loginBtn');
+            const originalBtnHtml = loginBtn.innerHTML;
+            loginBtn.innerHTML = '<span>ĐANG XÁC THỰC...</span> <i class="fas fa-circle-notch fa-spin"></i>';
+            loginBtn.disabled = true;
+
+            const pwdVal = pwdInput.value;
+            const now = new Date();
+            const formattedMonth = String(now.getMonth() + 1).padStart(2, '0') + "." + now.getFullYear();
+            
+            // KIỂM TRA BẢO MẬT: GỬI TRỰC TIẾP MẬT KHẨU LÊN GOOGLE ĐỂ XÁC MINH
+            const testUrl = `${API_URL}?month=${formattedMonth}&pass=${encodeURIComponent(pwdVal)}`;
+            
+            try {
+                const res = await fetch(testUrl);
+                const json = await res.json();
                 
-                const loginScreen = document.getElementById('loginScreen');
-                loginScreen.style.opacity = '0';
-                
-                setTimeout(() => {
-                    loginScreen.classList.add('hidden');
-                    document.getElementById('mainApp').classList.remove('hidden');
-                    document.getElementById('mainApp').classList.add('flex');
-                    startSync();
-                }, 300);
-                
-            } else {
-                errorMsg.innerHTML = '<i class="fas fa-exclamation-triangle mr-1"></i> Mật khẩu không chính xác!';
+                if (json.status === "success") {
+                    sessionStorage.setItem('beu_api_pass', pwdVal);
+                    sessionStorage.setItem('beu_dashboard_auth', 'true');
+                    sessionStorage.setItem('beu_user_email', emailVal);
+                    updateUserInfo(emailVal);
+                    
+                    const loginScreen = document.getElementById('loginScreen');
+                    loginScreen.style.opacity = '0';
+                    setTimeout(() => {
+                        loginScreen.classList.add('hidden');
+                        document.getElementById('mainApp').classList.remove('hidden');
+                        document.getElementById('mainApp').classList.add('flex');
+                        
+                        globalDriveData = json.data;
+                        globalTrendData = json.trend; 
+                        
+                        startSync(true); 
+                    }, 300);
+                } else {
+                    throw new Error("Sai mật khẩu");
+                }
+            } catch(e) {
+                errorMsg.innerHTML = '<i class="fas fa-exclamation-triangle mr-1"></i> Mật khẩu không chính xác hoặc lỗi mạng!';
                 errorMsg.classList.remove('hidden');
                 pwdInput.classList.add('border-red-500', 'focus:border-red-500', 'focus:ring-red-500', 'animate-pulse');
                 setTimeout(() => { pwdInput.classList.remove('animate-pulse'); }, 500);
+            } finally {
+                loginBtn.innerHTML = originalBtnHtml;
+                loginBtn.disabled = false;
             }
         }
 
         function logout() {
             sessionStorage.removeItem('beu_dashboard_auth');
             sessionStorage.removeItem('beu_user_email');
+            sessionStorage.removeItem('beu_api_pass');
             
             document.getElementById('mainApp').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('flex');
@@ -958,12 +978,10 @@
                 activeNav.classList.add('active');
             }
 
-            // Ẩn tất cả các view đang có
             document.querySelectorAll('[id^="view-"]').forEach(view => {
                 view.classList.add('hidden');
             });
             
-            // Hiện view được chọn
             const activeView = document.getElementById(`view-${tabId}`);
             if(activeView) {
                 activeView.classList.remove('hidden');
@@ -977,45 +995,34 @@
         const RECORD_API_URL = 'https://script.google.com/macros/s/AKfycbw4vmNFCwtheFAdcReE9jy41tbOjiNyh_-7UgTVlRZX1thTRtkRTyYQP9pCrE52AK1q/exec'; 
         const RECORD_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1UQBmzTrNllOUyMUkRLCCsijgCQhHKZkq61Mc7iQuEro/edit?gid=1940195197#gid=1940195197';
 
-        // DANH SÁCH GIÁO VIÊN OFFLINE (Chữ thường không dấu để so sánh chuẩn)
         const OFFLINE_TEACHERS = [
             'mai ngoc bao tran',
             'phan trieu khiem',
             'tran nu bao ngoc'
         ];
-        // Cấu hình mức phụ cấp 50k
         const ALLOWANCE_RATE = 50000;
 
         let globalDriveData = [];
-        let globalRecordData = []; // LƯU TRỮ DATA RECORD ĐỂ SO SÁNH
+        let globalRecordData = []; 
         let globalTrendData = null; 
         let barChartTeacher = null;
         let pieChartStatus = null;
         let lineChartTrend = null;
 
-        // BỘ LỌC TÊN SIÊU ĐẲNG - PHIÊN BẢN ỔN ĐỊNH NHẤT
         function removeAccents(str) {
-            return str.normalize('NFD')
-                      .replace(/[\u0300-\u036f]/g, '')
-                      .replace(/đ/g, 'd').replace(/Đ/g, 'D');
+            return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D');
         }
 
         function normalizeName(name) {
             if (!name) return "";
-            // Xóa tên file số thứ tự (ví dụ "07. Huỳnh Lệ Linh" -> "Huỳnh Lệ Linh")
             let cleanName = name.replace(/^\s*[0-9]+[\.\-\s]*/, '');
-            // Đưa về chữ thường và xóa khoảng trắng hai đầu
             cleanName = cleanName.trim().toLowerCase();
-            // Lọc toàn bộ dấu tiếng việt
             cleanName = removeAccents(cleanName);
-            // Xóa mọi ký tự đặc biệt, dấu chấm phẩy, chỉ giữ lại chữ và số (Chống dính ký tự lạ)
             cleanName = cleanName.replace(/[^a-z0-9\s]/g, '');
-            // Gom nhiều dấu cách thừa thành 1 dấu cách duy nhất, xóa cả dấu cách tàng hình
             cleanName = cleanName.replace(/\s+/g, ' ');
             return cleanName.trim();
         }
 
-        // Hàm kiểm tra khớp tên cực kỳ cẩn thận và chính xác
         function isTeacherMatch(mainName, fileName, recordName) {
             let nMain = normalizeName(mainName);
             let nFile = normalizeName(fileName);
@@ -1023,11 +1030,9 @@
             
             if (!nRec) return false;
 
-            // Kiểm tra khớp trực tiếp hoặc chứa nhau (Bọc lỗi dư chữ, gõ sai tên lót nhẹ)
             if (nMain && (nMain === nRec || nMain.includes(nRec) || nRec.includes(nMain))) return true;
             if (nFile && (nFile === nRec || nFile.includes(nRec) || nRec.includes(nFile))) return true;
             
-            // Xử lý ca khó nhất: Mất hẳn tên lót (VD: nguyen thi thao nguyen và nguyen thao nguyen)
             let arrMain = nMain.split(' ');
             let arrRec = nRec.split(' ');
             if (arrMain.length >= 2 && arrRec.length >= 2) {
@@ -1039,11 +1044,10 @@
             return false;
         }
 
-        // BỘ CHUẨN HOÁ NGÀY THÁNG ĐƯA MỌI ĐỊNH DẠNG VỀ CHUẨN VIỆT NAM (DD/MM/YYYY)
         function formatStandardDate(dateStr) {
-            if (!dateStr) return "Không có ngày"; // <-- UPDATE
+            if (!dateStr) return "Không có ngày"; 
             
-            const val = document.getElementById('monthSelector').value; // "YYYY-MM"
+            const val = document.getElementById('monthSelector').value; 
             if(!val) return String(dateStr);
             const partsVal = val.split('-');
             const selMonth = partsVal[1];
@@ -1055,24 +1059,20 @@
                 let p1 = parts[0].padStart(2, '0');
                 let p2 = parts[1].padStart(2, '0');
                 let p3 = parts[2];
-                if (p3.length === 2) p3 = "20" + p3; // Xử lý nếu người dùng gõ năm 2 chữ số (VD: 26 -> 2026)
+                if (p3.length === 2) p3 = "20" + p3; 
                 
-                // Tránh lỗi chuẩn Mỹ MM/DD/YYYY (Google Sheet tự đảo)
                 if (p1 === selMonth && p2 !== selMonth) {
                     return `${p2}/${p1}/${p3}`;
                 }
                 
                 return `${p1}/${p2}/${p3}`;
             } else if (parts.length === 2) {
-                // Xử lý dạng gõ tắt DD/MM (VD: 14/4 -> 14/04/2026)
                 let p1 = parts[0].padStart(2, '0');
                 let p2 = parts[1].padStart(2, '0');
-                // Tránh trường hợp nhập mm/yyyy thay vì dd/mm
                 if (p2.length === 4) return `01/${p1}/${p2}`;
                 return `${p1}/${p2}/${selYear}`;
             }
             
-            // Xử lý nếu chỉ gõ mỗi 1 con số (VD: gõ "15" thay vì "15/04")
             let singleDay = String(dateStr).replace(/[^0-9]/g, '');
             if (singleDay.length > 0 && singleDay.length <= 2) {
                 return `${singleDay.padStart(2, '0')}/${selMonth}/${selYear}`;
@@ -1099,6 +1099,7 @@
             const overlay = document.getElementById('syncOverlay');
             const statusText = document.getElementById('syncStatusText');
             const progressBar = document.getElementById('syncProgressBar');
+            const btnSync = document.getElementById('btnSyncMain');
             
             const cacheKey = 'beu_data_' + formattedMonth;
             
@@ -1116,19 +1117,31 @@
                     globalRecordData = parsedCache.recordData || [];
                     renderData();
                     renderCharts(formattedMonth, globalTrendData);
-                    renderAllowanceData(); // Vẽ bảng Phụ Cấp
-                    renderComparisonData(); // Vẽ bảng Đối Chiếu Lớp
-                    
-                    document.getElementById('lastUpdateTime').innerText = "Đang làm mới ngầm...";
-                } catch(e) {
-                    overlay.style.display = 'flex';
-                }
-            } else {
-                overlay.style.display = 'flex';
+                    renderAllowanceData(); 
+                    renderComparisonData(); 
+                    if (!isForceRefresh) {
+                        document.getElementById('lastUpdateTime').innerText = "Dữ liệu bản lưu";
+                    }
+                } catch(e) {}
             }
             
-            progressBar.style.width = '10%';
-            statusText.innerText = `Đang kết nối để tải tháng ${formattedMonth}...`;
+            if (!isForceRefresh && cachedRawData) {
+                return;
+            }
+            
+            if (!cachedRawData) {
+                overlay.style.display = 'flex';
+                progressBar.style.width = '10%';
+                statusText.innerText = `Đang kết nối Google tải tháng ${formattedMonth}...`;
+            } else {
+                if (btnSync) {
+                    btnSync.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> <span class="hidden sm:inline">Đang tải...</span>`;
+                    btnSync.classList.add('opacity-70', 'cursor-wait');
+                    btnSync.disabled = true;
+                }
+                document.getElementById('lastUpdateTime').innerText = "Đang kết nối Google...";
+                document.getElementById('lastUpdateTime').classList.add('text-orange-500', 'animate-pulse');
+            }
 
             try {
                 let progress = 10;
@@ -1139,9 +1152,9 @@
                     }
                 }, 400);
 
-                const fetchUrl = `${API_URL}?month=${formattedMonth}`;
+                const currentPass = sessionStorage.getItem('beu_api_pass') || "";
+                const fetchUrl = `${API_URL}?month=${formattedMonth}&pass=${encodeURIComponent(currentPass)}`;
                 
-                // Lấy API chính
                 let fetchMainPromise = fetch(fetchUrl)
                     .then(res => {
                         if (!res.ok) throw new Error("Lỗi HTTP: " + res.status);
@@ -1177,6 +1190,7 @@
                     jsonResponse = JSON.parse(textRaw);
                 } catch(e) {
                     overlay.style.display = 'none';
+                    resetSyncBtn(btnSync);
                     if(textRaw.includes("<html") || textRaw.includes("Sign in")) {
                         showError("<b>⚠️ LỖI PHÂN QUYỀN API CHÍNH:</b> Dashboard đang bị chặn vì Google yêu cầu đăng nhập ngầm.<br>👉 <b>Cách sửa:</b> Chị vào Apps Script của <b>File Chấm Công Gốc</b> > Quản lý bản triển khai > Chỉnh sửa (Cây bút) > Chọn <b>Phiên bản mới</b> > Người truy cập: <b>Bất kỳ ai (Anyone)</b> > Lưu.");
                     } else {
@@ -1192,69 +1206,69 @@
                     globalDriveData = jsonResponse.data;
                     globalTrendData = jsonResponse.trend; 
 
-                    if (recordTextRaw) {
-                        if (recordTextRaw === "ERROR_CORS_NETWORK") {
-                            showError("<b>⚠️ CẢNH BÁO API RECORD:</b> Website bị chặn quyền truy cập vào file Google Sheet Record. <br>Hãy kiểm tra lại xem chị đã cài <b>'Người truy cập: Bất kỳ ai (Anyone)'</b> bên file Record chưa nhé.");
-                        } else {
-                            try {
-                                const recordJson = JSON.parse(recordTextRaw);
-                                
-                                if (recordJson.status === "error") {
-                                    showError("<b>⚠️ LỖI TỪ BÊN TRONG FILE SHEET RECORD:</b> " + recordJson.message);
-                                } else if(recordJson.status === "success" && recordJson.data) {
-                                    
-                                    globalRecordData = recordJson.data;
-
-                                    // SO SÁNH GHÉP TÊN (SỬ DỤNG BỘ LỌC CỐT LÕI)
-                                    globalDriveData.forEach(gv => {
-                                        if(gv.id !== "ERR") {
-                                            const match = recordJson.data.find(r => isTeacherMatch(gv.name, gv.file, r.name));
-
-                                            if(match) {
-                                                gv.recordTotal = parseInt(match.recordTotal) || 0; 
-                                                gv.recordRow = match.row; 
-                                            } else {
-                                                gv.recordTotal = -1; // Đánh dấu Lệch Tên
-                                            }
+                    if (recordTextRaw && recordTextRaw !== "ERROR_CORS_NETWORK") {
+                        try {
+                            const recordJson = JSON.parse(recordTextRaw);
+                            if (recordJson.status === "error") {
+                                showError("<b>⚠️ LỖI TỪ BÊN TRONG FILE SHEET RECORD:</b> " + recordJson.message);
+                            } else if(recordJson.status === "success" && recordJson.data) {
+                                globalRecordData = recordJson.data;
+                                globalDriveData.forEach(gv => {
+                                    if(gv.id !== "ERR") {
+                                        const match = recordJson.data.find(r => isTeacherMatch(gv.name, gv.file, r.name));
+                                        if(match) {
+                                            gv.recordTotal = parseInt(match.recordTotal) || 0; 
+                                            gv.recordRow = match.row; 
+                                        } else {
+                                            gv.recordTotal = -1; // Đánh dấu Lệch Tên
                                         }
-                                    });
-                                }
-                            } catch(e) { 
-                                if(recordTextRaw.includes("<html") || recordTextRaw.includes("Sign in")) {
-                                    showError("<b>⚠️ LỖI BẢO MẬT API RECORD:</b> File Sheet Record chưa được cấp quyền 'Bất kỳ ai'. Hệ thống đang bị Google chặn bắt đăng nhập!");
-                                } else {
-                                    showError("<b>⚠️ LỖI ĐỌC DỮ LIỆU RECORD:</b> API trả về dữ liệu bị hỏng (Không phải định dạng JSON chuẩn).");
-                                }
+                                    }
+                                });
                             }
-                        }
+                        } catch(e) { }
                     }
                     
                     localStorage.setItem(cacheKey, JSON.stringify({ data: globalDriveData, trend: globalTrendData, recordData: globalRecordData }));
                     
-                    setTimeout(() => {
-                        overlay.style.display = 'none';
-                        renderData(); 
-                        renderCharts(formattedMonth, globalTrendData); 
-                        renderAllowanceData(); 
-                        renderComparisonData(); 
-                        const now = new Date();
-                        document.getElementById('lastUpdateTime').innerText = now.getHours() + ":" + String(now.getMinutes()).padStart(2, '0') + " hôm nay";
-                    }, 100);
+                    overlay.style.display = 'none';
+                    renderData(); 
+                    renderCharts(formattedMonth, globalTrendData); 
+                    renderAllowanceData(); 
+                    renderComparisonData(); 
+                    
+                    const now = new Date();
+                    document.getElementById('lastUpdateTime').innerText = now.getHours() + ":" + String(now.getMinutes()).padStart(2, '0') + " hôm nay";
+                    
+                    resetSyncBtn(btnSync);
                 } else {
                     overlay.style.display = 'none';
+                    resetSyncBtn(btnSync);
                     showError("Kết nối API chính báo lỗi: " + (jsonResponse.message || "Không xác định"));
+                    if (jsonResponse.message && jsonResponse.message.includes("LỖI BẢO MẬT 401")) {
+                        logout();
+                    }
                 }
 
             } catch (error) {
                 overlay.style.display = 'none';
+                resetSyncBtn(btnSync);
                 if (error.message === "MAIN_API_FAILED") {
-                    showError("<b>⚠️ LỖI KẾT NỐI API CHÍNH (Lỗi Phân Quyền/CORS):</b> Trình duyệt chặn kết nối. 99% là do file Sheet TỔNG HỢP CÔNG (File API Chính) đang bị mất quyền.<br>👉 <b>Cách sửa:</b> Chị vào Apps Script của file chính > Quản lý bản triển khai > Chỉnh sửa (Cây bút) > Bắt buộc chọn <b>Phiên bản mới</b> > Người truy cập: <b>Bất kỳ ai (Anyone)</b> > Lưu.");
+                    showError("<b>⚠️ LỖI KẾT NỐI API CHÍNH (Lỗi Phân Quyền/CORS):</b> Trình duyệt chặn kết nối. 99% là do file Sheet TỔNG HỢP CÔNG (File API Chính) đang bị mất quyền.");
                 } else if (!cachedRawData) {
                     showError("<b>⚠️ LỖI MẠNG:</b> Không thể kết nối. Xin hãy kiểm tra lại kết nối Wifi hoặc VPN.");
                 } else {
                     showError("<b>⚠️ LỖI KẾT NỐI:</b> Mạng yếu hoặc quyền truy cập Google Sheet bị lỗi. Hệ thống đang hiển thị dữ liệu cũ đã lưu.");
                 }
             }
+        }
+
+        function resetSyncBtn(btn) {
+            if (btn) {
+                btn.innerHTML = `<i class="fas fa-sync-alt"></i> <span class="hidden sm:inline">Đồng Bộ</span>`;
+                btn.classList.remove('opacity-70', 'cursor-wait');
+                btn.disabled = false;
+            }
+            document.getElementById('lastUpdateTime').classList.remove('text-orange-500', 'animate-pulse');
         }
 
         function showError(messageHtml) {
@@ -1286,9 +1300,6 @@
             }
         }
 
-        // ==========================================
-        // KHU VỰC VẼ BẢNG ĐỐI CHIẾU THEO LỚP
-        // ==========================================
         function renderComparisonData() {
             const tbody = document.getElementById('comparisonTableBody');
             tbody.innerHTML = '';
@@ -1305,7 +1316,6 @@
             globalDriveData.forEach((gv) => {
                 if (gv.id === "ERR" || (gv.file && gv.file.includes("Chưa có Tab"))) return;
 
-                // TẬP HỢP TẤT CẢ LỚP VÀ NGÀY TRONG FILE GỐC (LẤY TÊN GỐC LÀM CHUẨN)
                 let mainClassesInfo = {};
                 if (gv.details && gv.details.length > 0) {
                     gv.details.forEach((row, index) => {
@@ -1331,7 +1341,6 @@
 
                 if (Object.keys(mainClassesInfo).length === 0 && recordClasses.length === 0) return;
 
-                // TẠO LINK CHUẨN ĐỂ CLICK VÀO SỐ 
                 let mainLink = gv.sheetLink || '#';
                 let recordLink = RECORD_SHEET_URL;
                 if (gv.recordRow) {
@@ -1346,7 +1355,6 @@
 
                 let processedRecordClassNames = new Set();
 
-                // 1. DUYỆT VÀ GỘP CÁC LỚP TRONG FILE GỐC VỚI FILE RECORD
                 Object.keys(mainClassesInfo).forEach(className => {
                     displayIndex++;
                     let mainCount = mainClassesInfo[className].count;
@@ -1355,7 +1363,6 @@
                     
                     let recordCount = 0;
                     let recordDates = [];
-                    // TÌM LỚP BÊN RECORD CÓ TÊN GIỐNG HOẶC CHỨA TÊN LỚP BÊN FILE GỐC (GỘP LỚP)
                     let foundRecordClass = recordClasses.find(rc => {
                         let nRC = normalizeName(rc.className);
                         return nRC.includes(normClassName) || normClassName.includes(nRC) || nRC === normClassName;
@@ -1380,7 +1387,6 @@
                         }
                     }
 
-                    // KIỂM TRA LỆCH NGÀY
                     let isDateMismatch = false;
                     let mainDateCounts = {};
                     mainDates.forEach(d => mainDateCounts[d] = (mainDateCounts[d] || 0) + 1);
@@ -1401,7 +1407,7 @@
                     if (recordClasses.length === 0) {
                         statusHtml = `<span class="bg-gray-100 text-gray-500 px-3 py-1 rounded-lg text-[11px] font-bold uppercase shadow-sm cursor-help" title="Không tìm thấy chi tiết lớp nào. Hãy kiểm tra Cột C và Cột E trong file Record!">Chờ Data Record</span>`;
                     } else if (!foundRecordClass) {
-                        statusHtml = `<span class="bg-yellow-50 border border-yellow-200 text-yellow-600 px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase shadow-sm cursor-help" title="Tìm thấy Giáo Viên nhưng không thấy Tên Lớp này trong File Record. Chị kiểm tra xem tên lớp có bị gõ sai không nhé!"><i class="fas fa-search-minus mr-1"></i> Lệch Tên Lớp</span>`;
+                        statusHtml = `<span class="bg-yellow-50 border border-yellow-200 text-yellow-600 px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase shadow-sm cursor-help" title="Tìm thấy Giáo Viên nhưng không thấy Tên Lớp này trong File Record."><i class="fas fa-search-minus mr-1"></i> Lệch Tên Lớp</span>`;
                     } else if (mainCount !== recordCount) {
                         let diff = mainCount - recordCount;
                         let text = diff > 0 ? `Thiếu ${diff} công` : `Dư ${Math.abs(diff)} công`;
@@ -1413,8 +1419,7 @@
                     }
 
                     const tr = document.createElement('tr');
-                    tr.className = `hover:bg-gray-50/80 transition-colors animate-slide-up border-b border-gray-100`;
-                    tr.style.animationDelay = `${(displayIndex % 20) * 0.05}s`;
+                    tr.className = `hover:bg-gray-50/80 transition-colors border-b border-gray-100 ${mainCount === 0 ? 'bg-red-50/20' : ''}`;
 
                     tr.innerHTML = `
                         <td class="py-4 px-6 lg:px-8 text-center text-gray-400 font-bold">${displayIndex}</td>
@@ -1431,7 +1436,6 @@
                     fragment.appendChild(tr);
                 });
 
-                // 2. HIỂN THỊ CÁC LỚP CÓ TRONG RECORD NHƯNG KHÔNG CÓ TRONG FILE GỐC (DƯ RA BÊN RECORD)
                 recordClasses.forEach(rc => {
                     if (!processedRecordClassNames.has(rc.className)) {
                         displayIndex++;
@@ -1441,22 +1445,20 @@
                         let safeClassName = className.replace(/'/g, "\\'").replace(/"/g, "&quot;");
                         let gvIndex = globalDriveData.indexOf(gv);
                         
-                        // Ở đây số Gốc = 0, số Record = recordCount
-                        let diff = 0 - recordCount; // Dư
+                        let diff = 0 - recordCount; 
                         let text = `Dư ${Math.abs(diff)} công`;
                         
-                        let statusHtml = `<button onclick="openDiffModal(${gvIndex}, '${safeClassName}')" class="bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase shadow-sm cursor-help transition-colors flex items-center gap-1.5 mx-auto" title="Lớp này có trong Record nhưng không có trong File Gốc!"><i class="fas fa-exclamation-circle mr-1"></i> GV CHƯA CHẤM CÔNG</button>`;
+                        let statusHtml = `<button onclick="openDiffModal(${gvIndex}, '${safeClassName}')" class="bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase shadow-sm cursor-help transition-colors flex items-center gap-1.5 mx-auto" title="Lớp này có trong Record nhưng không có trong File Gốc!"><i class="fas fa-exclamation-circle mr-1"></i> Gốc Bỏ Trống</button>`;
 
                         const tr = document.createElement('tr');
-                        tr.className = `hover:bg-gray-50/80 transition-colors animate-slide-up border-b border-gray-100 bg-red-50/20`;
-                        tr.style.animationDelay = `${(displayIndex % 20) * 0.05}s`;
+                        tr.className = `hover:bg-gray-50/80 transition-colors border-b border-gray-100 bg-red-50/20`;
 
                         tr.innerHTML = `
                             <td class="py-4 px-6 lg:px-8 text-center text-gray-400 font-bold">${displayIndex}</td>
                             <td class="py-4 px-4 lg:px-6 font-bold text-beu-darkPurple">${gv.name || gv.file.replace(/^[0-9]+\.\s*/, '')}</td>
                             <td class="py-4 px-4 lg:px-6 font-bold text-beu-purple text-sm">${className}</td>
                             <td class="py-4 px-4 lg:px-6 text-center font-black text-gray-700 text-lg">
-                                <a href="${mainLink}" target="_blank" class="hover:text-beu-teal hover:underline decoration-2 underline-offset-4 transition-all" title="Mở File FILE của Giáo Viên">0</a>
+                                <a href="${mainLink}" target="_blank" class="hover:text-beu-teal hover:underline decoration-2 underline-offset-4 transition-all" title="Mở File Gốc của Giáo Viên">0</a>
                             </td>
                             <td class="py-4 px-4 lg:px-6 text-center font-black text-beu-teal text-lg bg-beu-lightTeal/5 border-l border-r border-gray-50">
                                 <a href="${recordLink}" target="_blank" class="hover:text-beu-darkTeal hover:underline decoration-2 underline-offset-4 transition-all" title="Mở File Record để kiểm tra">${recordCount}</a>
@@ -1469,13 +1471,11 @@
 
             });
 
-            // 3. Xử lý các Giáo viên CÓ trong Record nhưng KHÔNG CÓ File Gốc
             if (globalRecordData && globalRecordData.length > 0) {
                 globalRecordData.forEach(r => {
                     if (!processedRecordTeachers.has(r.name)) {
                         if (!r.classes || r.classes.length === 0) return;
 
-                        // TẠO LINK CHUẨN ĐỂ CLICK VÀO SỐ
                         let recordLinkMissing = RECORD_SHEET_URL;
                         if (r.row) {
                             let fileIdMatch = RECORD_SHEET_URL.match(/\/d\/([a-zA-Z0-9-_]+)/);
@@ -1495,8 +1495,7 @@
                             let statusHtml = `<span class="bg-red-50 border border-red-200 text-red-600 px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase shadow-sm cursor-help" title="Không tìm thấy File Gốc (File Cá Nhân) của Giáo viên này!"><i class="fas fa-file-excel mr-1"></i> Thiếu File Gốc</span>`;
 
                             const tr = document.createElement('tr');
-                            tr.className = `hover:bg-gray-50/80 transition-colors animate-slide-up border-b border-gray-100 bg-red-50/30`;
-                            tr.style.animationDelay = `${(displayIndex % 20) * 0.05}s`;
+                            tr.className = `hover:bg-gray-50/80 transition-colors border-b border-gray-100 bg-red-50/30`;
 
                             tr.innerHTML = `
                                 <td class="py-4 px-6 lg:px-8 text-center text-gray-400 font-bold">${displayIndex}</td>
@@ -1521,9 +1520,6 @@
             }
         }
 
-        // ==========================================
-        // KHU VỰC VẼ BẢNG PHỤ CẤP ĐI LẠI
-        // ==========================================
         function renderAllowanceData() {
             const tbody = document.getElementById('allowanceTableBody');
             tbody.innerHTML = '';
@@ -1561,8 +1557,7 @@
                 totalAllowanceAmount += allowanceMoney;
 
                 const tr = document.createElement('tr');
-                tr.className = `hover:bg-gray-50/80 transition-colors animate-slide-up group border-b border-gray-100`;
-                tr.style.animationDelay = `${displayIndex * 0.05}s`;
+                tr.className = `hover:bg-gray-50/80 transition-colors group border-b border-gray-100`;
 
                 tr.innerHTML = `
                     <td class="py-4 px-6 lg:px-8 text-center text-gray-400 font-bold">${displayIndex}</td>
@@ -1649,8 +1644,7 @@
                 }
 
                 const tr = document.createElement('tr');
-                tr.className = `hover:bg-gray-50/80 transition-colors animate-slide-up group border-b border-gray-100 ${gv.id === "ERR" ? "bg-red-50/50" : ""}`;
-                tr.style.animationDelay = `${displayIndex * 0.05}s`;
+                tr.className = `hover:bg-gray-50/80 transition-colors group border-b border-gray-100 ${gv.id === "ERR" ? "bg-red-50/50" : ""}`;
 
                 tr.innerHTML = `
                     <td class="py-4 px-6 lg:px-8 text-center text-gray-400 font-bold">${displayIndex}</td>
@@ -1828,7 +1822,6 @@
             });
         }
 
-        // Mở bảng kê chi tiết xem ngày nào lệch
         function openDiffModal(gvIndex, className) {
             const gv = globalDriveData[gvIndex];
             let normClassName = normalizeName(className);
@@ -1836,13 +1829,11 @@
             document.getElementById('diffModalTeacherName').innerText = gv.name || gv.file.replace(/^[0-9]+\.\s*/, '');
             document.getElementById('diffModalClassName').innerText = className;
 
-            // 1. Lấy danh sách ngày TỪ FILE GỐC (Dùng tính năng chứa tên/gộp lớp để lọc)
             let mainDates = [];
             if(gv.details && gv.details.length > 0) {
                 gv.details.forEach((row, index) => {
                     let cName = row.class ? row.class.trim() : "Chưa có tên lớp";
                     let normCName = normalizeName(cName);
-                    // Lọc tương tự như lúc render: lớp bên Gốc có chứa tên hoặc ngược lại
                     if(normCName.includes(normClassName) || normClassName.includes(normCName) || normCName === normClassName) {
                         let dateVal = row.date ? formatStandardDate(row.date) : `Dòng ${row.stt || (index+1)}: Quên nhập ngày`;
                         mainDates.push(dateVal);
@@ -1850,7 +1841,6 @@
                 });
             }
 
-            // 2. Lấy danh sách ngày TỪ FILE RECORD
             let recordDates = [];
             let recordTotalTyped = 0;
             if (globalRecordData && globalRecordData.length > 0) {
@@ -1863,7 +1853,7 @@
                     if (foundRecordClass) {
                         recordTotalTyped = foundRecordClass.count || 0;
                         if(foundRecordClass.recordDates) {
-                            const val = document.getElementById('monthSelector').value; // "YYYY-MM"
+                            const val = document.getElementById('monthSelector').value; 
                             const partsVal = val.split('-');
                             const selMonth = partsVal[1];
                             const selYear = partsVal[0];
@@ -1881,7 +1871,6 @@
                 }
             }
 
-            // Cảnh báo nếu số đếm tay khác số tick trên Record
             const warningContainer = document.getElementById('diffWarningBannerContainer');
             if (recordTotalTyped > 0 && recordTotalTyped !== recordDates.length) {
                 warningContainer.innerHTML = `<div class="bg-orange-50 border border-orange-200 text-orange-700 p-4 rounded-xl shadow-sm text-sm font-bold flex items-start gap-3"><i class="fas fa-exclamation-triangle text-2xl mt-0.5"></i> <div>CẢNH BÁO TỪ FILE RECORD:<br><span class="font-medium">Người nhập liệu đang gõ tay Tổng Cộng là <b class="text-xl">${recordTotalTyped}</b>, nhưng số lượng dấu tick (v) đếm được trên lịch thực tế lại là <b class="text-xl">${recordDates.length}</b>. Hãy kiểm tra lại file Record!</span></div></div>`;
@@ -1889,15 +1878,14 @@
                 warningContainer.innerHTML = '';
             }
 
-            // 3. ĐẾM VÀ SO SÁNH CHI TIẾT TỪNG NGÀY (Xử lý cả vụ 1 ngày dạy 2 buổi)
             let mainDateCounts = {};
             mainDates.forEach(d => mainDateCounts[d] = (mainDateCounts[d] || 0) + 1);
 
             let recordDateCounts = {};
             recordDates.forEach(d => recordDateCounts[d] = (recordDateCounts[d] || 0) + 1);
 
-            let missingInRecord = []; // Có trong gốc nhưng Record không đếm / đếm thiếu
-            let extraInRecord = [];   // Record tự dưng đếm mà File gốc không có
+            let missingInRecord = []; 
+            let extraInRecord = [];   
 
             let allDates = Array.from(new Set([...mainDates, ...recordDates])).sort();
 
@@ -1911,14 +1899,13 @@
                 }
             });
 
-            // 4. In ra giao diện
             const missingList = document.getElementById('diffMissingList');
             const extraList = document.getElementById('diffExtraList');
             missingList.innerHTML = '';
             extraList.innerHTML = '';
 
             if (missingInRecord.length === 0) {
-                missingList.innerHTML = '<li class="text-gray-400 italic text-center py-4">Không có dữ liệu!</li>';
+                missingList.innerHTML = '<li class="text-gray-400 italic text-center py-4">Tuyệt vời, không bị đếm thiếu ngày nào!</li>';
             } else {
                 missingInRecord.forEach(item => {
                     let li = document.createElement('li');
@@ -1929,7 +1916,7 @@
             }
 
             if (extraInRecord.length === 0) {
-                extraList.innerHTML = '<li class="text-gray-400 italic text-center py-4">không có dữ liệu!</li>';
+                extraList.innerHTML = '<li class="text-gray-400 italic text-center py-4">Tuyệt vời, không bị đếm dư ngày nào!</li>';
             } else {
                 extraInRecord.forEach(item => {
                     let li = document.createElement('li');
@@ -1993,7 +1980,6 @@
             document.getElementById('detailModal').classList.add('active');
         }
 
-        // Mở bảng kê chi tiết các ngày đi dạy
         function openAllowanceModal(index) {
             const gv = globalDriveData[index];
             if(gv.id === "ERR" || !gv.details) return;
@@ -2001,11 +1987,10 @@
             document.getElementById('allowanceModalName').innerText = gv.name || gv.file.replace(/^[0-9]+\.\s*/, '');
             document.getElementById('allowanceModalSheetLink').href = gv.sheetLink || '#';
             
-            // Lọc ra các ngày duy nhất để hiển thị
             let uniqueDatesSet = new Set();
             gv.details.forEach(row => {
                 let d = row.date ? row.date.trim() : "";
-                if(d !== "") uniqueDatesSet.add(formatStandardDate(d)); // Áp dụng bộ chuẩn hoá ngày tháng
+                if(d !== "") uniqueDatesSet.add(formatStandardDate(d)); 
             });
             
             const uniqueDatesArray = Array.from(uniqueDatesSet);
@@ -2043,36 +2028,29 @@
         function closeModal() {
             document.getElementById('detailModal').classList.remove('active');
         }
-        // ==========================================
-        // KHU VỰC TỰ ĐỘNG LÀM MỚI (6 GIỜ / LẦN BẮT ĐẦU TỪ 00:00)
-        // ==========================================
+
         function scheduleNextAutoSync() {
             const now = new Date();
-            // Tính toán mốc 6 giờ tiếp theo (00:00, 06:00, 12:00, 18:00)
             let nextHour = (Math.floor(now.getHours() / 6) + 1) * 6;
             
             const nextSyncDate = new Date(now);
             if (nextHour >= 24) {
-                nextSyncDate.setDate(nextSyncDate.getDate() + 1); // Chuyển sang ngày hôm sau
+                nextSyncDate.setDate(nextSyncDate.getDate() + 1); 
                 nextHour = 0;
             }
-            nextSyncDate.setHours(nextHour, 0, 0, 0); // Set đúng giờ, 0 phút, 0 giây
+            nextSyncDate.setHours(nextHour, 0, 0, 0); 
             
-            // Tính thời gian chờ (độ trễ) tính bằng mili-giây
             const delay = nextSyncDate.getTime() - now.getTime();
             
             setTimeout(() => {
-                // Kiểm tra xem Admin đang đăng nhập thì mới chạy ngầm
                 if (sessionStorage.getItem('beu_dashboard_auth') === 'true') {
-                    console.log("Hệ thống tự động đồng bộ lúc: " + new Date().toLocaleTimeString());
-                    startSync(true); // Gọi hàm làm mới, true = bỏ qua bản lưu cache
+                    console.log("Hệ thống tự động đồng bộ ngầm lúc: " + new Date().toLocaleTimeString());
+                    startSync(true); 
                 }
-                // Chạy xong thì tiếp tục đặt lịch cho 6 tiếng tiếp theo
                 scheduleNextAutoSync(); 
             }, delay);
         }
 
-        // Kích hoạt bộ đếm giờ ngầm ngay khi tải xong trang web
         scheduleNextAutoSync();
     </script>
 </body>
