@@ -887,56 +887,28 @@
             loginBtn.disabled = true;
 
             const pwdVal = pwdInput.value;
-            const now = new Date();
-            const formattedMonth = String(now.getMonth() + 1).padStart(2, '0') + "." + now.getFullYear();
             
-            // XAY NHUYỄN MẬT KHẨU THÀNH MÃ BĂM VÀ ĐƯA LÊN GOOGLE
+            // MÃ HÓA BĂM (HASH) MẬT KHẨU
             const inputHash = await sha256(pwdVal);
-            const testUrl = `${API_URL}?month=${formattedMonth}&token=${inputHash}`;
             
-            try {
-                const res = await fetch(testUrl);
-                const json = await res.json();
+            sessionStorage.setItem('beu_api_token', inputHash);
+            sessionStorage.setItem('beu_dashboard_auth', 'true');
+            sessionStorage.setItem('beu_user_email', emailVal);
+            updateUserInfo(emailVal);
+            
+            const loginScreen = document.getElementById('loginScreen');
+            loginScreen.style.opacity = '0';
+            
+            setTimeout(() => {
+                loginScreen.classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                document.getElementById('mainApp').classList.add('flex');
                 
-                if (json.status === "success") {
-                    // Google xác nhận đúng -> Chỉ lưu Token, không lưu Pass thật
-                    sessionStorage.setItem('beu_api_token', inputHash);
-                    sessionStorage.setItem('beu_dashboard_auth', 'true');
-                    sessionStorage.setItem('beu_user_email', emailVal);
-                    updateUserInfo(emailVal);
-                    
-                    const loginScreen = document.getElementById('loginScreen');
-                    loginScreen.style.opacity = '0';
-                    setTimeout(() => {
-                        loginScreen.classList.add('hidden');
-                        document.getElementById('mainApp').classList.remove('hidden');
-                        document.getElementById('mainApp').classList.add('flex');
-                        
-                        globalDriveData = json.data;
-                        globalTrendData = json.trend; 
-                        
-                        startSync(true); 
-                    }, 300);
-                } else {
-                    throw new Error(json.message || "Sai mật khẩu");
-                }
-            } catch(e) {
-                console.error("Chi tiết lỗi:", e);
-                
-                // TỰ ĐỘNG BẮT LỖI TỪ GOOGLE SCRIPT ĐỂ NHẮC ADMIN
-                if (e.message && e.message.includes("LỖI BẢO MẬT 401")) {
-                    errorMsg.innerHTML = `<i class="fas fa-exclamation-triangle mr-1"></i> Google Script chưa được cập nhật!<br><span class="text-[11px] font-medium mt-1.5 inline-block opacity-90 leading-relaxed">Chị vào Apps Script > Quản lý triển khai > Chọn Cây bút ✏️ > Đổi thành <b>Phiên bản mới (New version)</b> > Triển khai lại nhé.</span>`;
-                } else {
-                    errorMsg.innerHTML = '<i class="fas fa-exclamation-triangle mr-1"></i> Mật khẩu không chính xác hoặc lỗi mạng!';
-                }
-                
-                errorMsg.classList.remove('hidden');
-                pwdInput.classList.add('border-red-500', 'focus:border-red-500', 'focus:ring-red-500', 'animate-pulse');
-                setTimeout(() => { pwdInput.classList.remove('animate-pulse'); }, 500);
-            } finally {
                 loginBtn.innerHTML = originalBtnHtml;
                 loginBtn.disabled = false;
-            }
+                
+                startSync(true); 
+            }, 400);
         }
 
         function logout() {
@@ -1170,7 +1142,6 @@
                     }
                 }, 400);
 
-                // LẤY MÃ BĂM TỪ BỘ NHỚ RA ĐỂ GỌI API (Không gửi Pass thật)
                 const currentToken = sessionStorage.getItem('beu_api_token') || "";
                 const fetchUrl = `${API_URL}?month=${formattedMonth}&token=${currentToken}`;
                 
@@ -1262,9 +1233,29 @@
                 } else {
                     overlay.style.display = 'none';
                     resetSyncBtn(btnSync);
-                    showError("Kết nối API chính báo lỗi: " + (jsonResponse.message || "Không xác định"));
+                    
                     if (jsonResponse.message && jsonResponse.message.includes("LỖI BẢO MẬT 401")) {
-                        logout();
+                        // Kicked out due to wrong password
+                        sessionStorage.removeItem('beu_dashboard_auth');
+                        sessionStorage.removeItem('beu_api_token');
+                        
+                        document.getElementById('mainApp').classList.add('hidden');
+                        document.getElementById('mainApp').classList.remove('flex');
+                        
+                        const loginScreen = document.getElementById('loginScreen');
+                        loginScreen.classList.remove('hidden');
+                        loginScreen.style.opacity = '1';
+                        
+                        const pwdInput = document.getElementById('passwordInput');
+                        const errorMsg = document.getElementById('loginError');
+                        pwdInput.value = '';
+                        errorMsg.innerHTML = '<i class="fas fa-exclamation-triangle mr-1"></i> Mật khẩu không chính xác hoặc chưa được cấp quyền!';
+                        errorMsg.classList.remove('hidden');
+                        pwdInput.classList.add('border-red-500', 'focus:border-red-500', 'focus:ring-red-500', 'animate-pulse');
+                        setTimeout(() => { pwdInput.classList.remove('animate-pulse'); }, 500);
+                        pwdInput.focus();
+                    } else {
+                        showError("Kết nối API chính báo lỗi: " + (jsonResponse.message || "Không xác định"));
                     }
                 }
 
@@ -1445,7 +1436,7 @@
                         <td class="py-4 px-4 lg:px-6 font-bold text-beu-darkPurple">${gv.name || gv.file.replace(/^[0-9]+\.\s*/, '')}</td>
                         <td class="py-4 px-4 lg:px-6 font-bold text-beu-purple text-sm">${className}</td>
                         <td class="py-4 px-4 lg:px-6 text-center font-black text-gray-700 text-lg">
-                            <a href="${mainLink}" target="_blank" class="hover:text-beu-teal hover:underline decoration-2 underline-offset-4 transition-all" title="M mở File Gốc của Giáo Viên">${mainCount}</a>
+                            <a href="${mainLink}" target="_blank" class="hover:text-beu-teal hover:underline decoration-2 underline-offset-4 transition-all" title="Mở File Gốc của Giáo Viên">${mainCount}</a>
                         </td>
                         <td class="py-4 px-4 lg:px-6 text-center font-black text-beu-teal text-lg bg-beu-lightTeal/5 border-l border-r border-gray-50">
                             <a href="${recordLink}" target="_blank" class="hover:text-beu-darkTeal hover:underline decoration-2 underline-offset-4 transition-all" title="Mở File Record để kiểm tra">${recordCount || '<span class="text-xs text-gray-300 font-medium">0</span>'}</a>
