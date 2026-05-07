@@ -789,6 +789,18 @@
     </div>
 
     <script>
+        // Hàm bổ sung giúp xử lý ngày tháng triệt để nhất từ Google Sheets
+        function parseRecordHeaderDate(d) {
+            let strD = String(d).trim();
+            if ((strD.includes("GMT") || strD.includes("T") || strD.length > 15) && !isNaN(Date.parse(strD))) {
+                let tempDate = new Date(strD);
+                return String(tempDate.getDate()).padStart(2, '0');
+            }
+            let dayStr = strD.split(/[\/\-]/)[0].replace(/[^0-9]/g, '');
+            if (dayStr.length > 2) dayStr = dayStr.substring(0, 2); 
+            return dayStr.padStart(2, '0');
+        }
+
         // BỘ CÔNG CỤ BĂM MẬT KHẨU SHA-256 CỰC KỲ BẢO MẬT
         async function sha256(message) {
             const msgBuffer = new TextEncoder().encode(message);
@@ -1043,7 +1055,16 @@
             const selMonth = partsVal[1];
             const selYear = partsVal[0];
 
-            let parts = String(dateStr).trim().split(/[\/\-]/);
+            let strD = String(dateStr).trim();
+            if ((strD.includes("GMT") || strD.includes("T") || strD.length > 15) && !isNaN(Date.parse(strD))) {
+                let tempDate = new Date(strD);
+                let d = String(tempDate.getDate()).padStart(2, '0');
+                let m = String(tempDate.getMonth() + 1).padStart(2, '0');
+                let y = tempDate.getFullYear();
+                return `${d}/${m}/${y}`;
+            }
+
+            let parts = strD.split(/[\/\-]/);
             
             if (parts.length === 3) {
                 let p1 = parts[0].padStart(2, '0');
@@ -1063,7 +1084,7 @@
                 return `${p1}/${p2}/${selYear}`;
             }
             
-            let singleDay = String(dateStr).replace(/[^0-9]/g, '');
+            let singleDay = strD.replace(/[^0-9]/g, '');
             if (singleDay.length > 0 && singleDay.length <= 2) {
                 return `${singleDay.padStart(2, '0')}/${selMonth}/${selYear}`;
             }
@@ -1392,9 +1413,9 @@
                             const selYear = partsVal[0];
 
                             recordDates = foundRecordClass.recordDates.map(d => {
-                                let dayStr = String(d).split('/')[0].replace(/[^0-9]/g, '');
-                                if(dayStr) {
-                                    return `${dayStr.padStart(2, '0')}/${selMonth}/${selYear}`;
+                                let dayStr = parseRecordHeaderDate(d);
+                                if(dayStr && parseInt(dayStr) > 0 && parseInt(dayStr) <= 31) {
+                                    return `${dayStr}/${selMonth}/${selYear}`;
                                 }
                                 return `Ngày ${d}`;
                             });
@@ -1876,10 +1897,9 @@
                             const selYear = partsVal[0];
 
                             recordDates = foundRecordClass.recordDates.map(d => {
-                                let dayStr = String(d).split('/')[0].replace(/[^0-9]/g, '');
-                                if(dayStr) {
-                                    let day = dayStr.padStart(2, '0');
-                                    return `${day}/${selMonth}/${selYear}`;
+                                let dayStr = parseRecordHeaderDate(d);
+                                if(dayStr && parseInt(dayStr) > 0 && parseInt(dayStr) <= 31) {
+                                    return `${dayStr}/${selMonth}/${selYear}`;
                                 }
                                 return `Ngày ${d}`;
                             });
