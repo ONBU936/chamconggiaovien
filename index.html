@@ -1082,7 +1082,9 @@
             }
             
             const parts = selectedMonthVal.split('-');
-            const formattedMonth = `${parts[1]}.${parts[0]}`;
+            const formattedMonth = `${parts[1]}.${parts[0]}`; // Ví dụ "05.2026"
+            const monthNum = parseInt(parts[1], 10); // Ví dụ "5"
+            const recordTabName = `DataRecord Tháng ${monthNum}`;
 
             document.getElementById('dynamicMonthTitle').innerText = `Tổng Hợp Công - Tháng ${formattedMonth}`;
 
@@ -1157,7 +1159,9 @@
                 
                 let fetchRecordPromise = Promise.resolve(null);
                 if (RECORD_API_URL && RECORD_API_URL.trim() !== '') {
-                    fetchRecordPromise = fetch(`${RECORD_API_URL}?month=${formattedMonth}`)
+                    // Cập nhật đường dẫn truyền đủ tham số nhận diện Tab Record
+                    const recordQueryUrl = `${RECORD_API_URL}?month=${formattedMonth}&m=${monthNum}&sheetName=${encodeURIComponent(recordTabName)}&tabName=${encodeURIComponent(recordTabName)}`;
+                    fetchRecordPromise = fetch(recordQueryUrl)
                         .then(res => {
                             if (!res.ok) throw new Error("Lỗi HTTP: " + res.status);
                             return res.text();
@@ -1235,7 +1239,6 @@
                     resetSyncBtn(btnSync);
                     
                     if (jsonResponse.message && jsonResponse.message.includes("LỖI BẢO MẬT 401")) {
-                        // Kicked out due to wrong password
                         sessionStorage.removeItem('beu_dashboard_auth');
                         sessionStorage.removeItem('beu_api_token');
                         
@@ -1355,11 +1358,12 @@
                 let recordLink = RECORD_SHEET_URL;
                 if (gv.recordRow) {
                     let fileIdMatch = RECORD_SHEET_URL.match(/\/d\/([a-zA-Z0-9-_]+)/);
-                    let gidMatch = RECORD_SHEET_URL.match(/gid=([0-9]+)/);
-                    if (fileIdMatch && gidMatch) {
-                        recordLink = `https://docs.google.com/spreadsheets/d/${fileIdMatch[1]}/edit#gid=${gidMatch[1]}&range=C${gv.recordRow}`;
-                    } else {
-                        recordLink = RECORD_SHEET_URL.split('?')[0].split('#')[0] + '#range=C' + gv.recordRow;
+                    if (fileIdMatch) {
+                        const partsVal = document.getElementById('monthSelector').value.split('-');
+                        let monthNum = parseInt(partsVal[1], 10);
+                        let targetTabName = "DataRecord Tháng " + monthNum;
+                        let encodedTab = encodeURIComponent(targetTabName);
+                        recordLink = `https://docs.google.com/spreadsheets/d/${fileIdMatch[1]}/edit#range=${encodedTab}!C${gv.recordRow}`;
                     }
                 }
 
@@ -1489,11 +1493,12 @@
                         let recordLinkMissing = RECORD_SHEET_URL;
                         if (r.row) {
                             let fileIdMatch = RECORD_SHEET_URL.match(/\/d\/([a-zA-Z0-9-_]+)/);
-                            let gidMatch = RECORD_SHEET_URL.match(/gid=([0-9]+)/);
-                            if (fileIdMatch && gidMatch) {
-                                recordLinkMissing = `https://docs.google.com/spreadsheets/d/${fileIdMatch[1]}/edit#gid=${gidMatch[1]}&range=C${r.row}`;
-                            } else {
-                                recordLinkMissing = RECORD_SHEET_URL.split('?')[0].split('#')[0] + '#range=C' + r.row;
+                            if (fileIdMatch) {
+                                const partsVal = document.getElementById('monthSelector').value.split('-');
+                                let monthNum = parseInt(partsVal[1], 10);
+                                let targetTabName = "DataRecord Tháng " + monthNum;
+                                let encodedTab = encodeURIComponent(targetTabName);
+                                recordLinkMissing = `https://docs.google.com/spreadsheets/d/${fileIdMatch[1]}/edit#range=${encodedTab}!C${r.row}`;
                             }
                         }
 
@@ -1634,18 +1639,20 @@
                     let targetUrl = RECORD_SHEET_URL;
                     if (gv.recordRow) {
                         let fileIdMatch = RECORD_SHEET_URL.match(/\/d\/([a-zA-Z0-9-_]+)/);
-                        let gidMatch = RECORD_SHEET_URL.match(/gid=([0-9]+)/);
-                        
-                        if (fileIdMatch && gidMatch) {
-                            targetUrl = `https://docs.google.com/spreadsheets/d/${fileIdMatch[1]}/edit#gid=${gidMatch[1]}&range=D${gv.recordRow}`;
-                        } else {
-                            targetUrl = RECORD_SHEET_URL.split('?')[0].split('#')[0] + '#range=D' + gv.recordRow;
+                        if (fileIdMatch) {
+                            const partsVal = document.getElementById('monthSelector').value.split('-');
+                            let monthNum = parseInt(partsVal[1], 10);
+                            let targetTabName = "DataRecord Tháng " + monthNum;
+                            let encodedTab = encodeURIComponent(targetTabName);
+                            targetUrl = `https://docs.google.com/spreadsheets/d/${fileIdMatch[1]}/edit#range=${encodedTab}!D${gv.recordRow}`;
                         }
                     }
 
                     if (gv.recordTotal === -1) {
                         let tenTimKiem = normalizeName(gv.name);
-                        recordHtml = `<span class="text-yellow-600 font-bold text-[10px] bg-yellow-50 border border-yellow-200 px-3 py-1.5 rounded-lg shadow-sm uppercase whitespace-nowrap cursor-help" title="Web đang tìm '${tenTimKiem}' nhưng không thấy bên File Record. Chị xem có bị lệch gì không nhé!">Lệch Tên</span>`;
+                        const partsVal = document.getElementById('monthSelector').value.split('-');
+                        let hthiThang = partsVal[1];
+                        recordHtml = `<span class="text-yellow-600 font-bold text-[10px] bg-yellow-50 border border-yellow-200 px-3 py-1.5 rounded-lg shadow-sm uppercase whitespace-nowrap cursor-help" title="Web đang tìm tên '${tenTimKiem}' trong tab 'DataRecord Tháng ${parseInt(hthiThang)}' nhưng không thấy. Chị check lại nhé!">Lệch Tên</span>`;
                     } else if (gv.recordTotal === gv.total) {
                         recordHtml = `<a href="${targetUrl}" target="_blank" class="text-[#15803d] font-black text-lg hover:text-[#166534] transition-colors cursor-pointer focus:outline-none flex items-center justify-center mx-auto gap-1.5 w-max" title="Khớp 100%. Bấm để kiểm tra file Record"><i class="fas fa-check-circle text-sm"></i><span class="underline underline-offset-4 decoration-2">${gv.recordTotal}</span></a>`;
                     } else {
